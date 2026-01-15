@@ -9,7 +9,7 @@ let rect1 = {
         notOver: "lightblue",
         over: "white",
     },
-    currentColor: "notOver",
+    over: false,
 };
 
 let rect2 = {
@@ -46,8 +46,6 @@ function setup() {
 function draw() {
     background("white");
 
-    mouseOver();
-
     drawRectangles(rect1);
     drawRectangles(rect2);
     drawRectangles(rect3);
@@ -57,36 +55,13 @@ function draw() {
 function drawRectangles(rectN) {
     noStroke();
 
-    if (rectN.currentColor === "notOver") {
-        fill(rectN.fill.notOver);
+    if (mouseX > rectN.x && mouseX < rectN.x + rectN.w && mouseY > rectN.y && mouseY < rectN.h) {
+        fill(rectN.fill.over);
     }
     else {
-        fill(rectN.fill.over)
+        fill(rectN.fill.notOver)
     }
 
     rect(rectN.x, rectN.y, rectN.w, rectN.h);
 };
 
-
-//color change
-function mouseOver() {
-    //rect 1
-    if (0 < mouseX < 200) {
-        rect1.currentColor = "over";
-        rect2.currentColor = "notOver";
-        rect3.currentColor = "notOver";
-    }
-    //rect 2
-    else if (200 < mouseX < 400) {
-        rect2.currentColor = "over";
-        rect1.currentColor = "notOver";
-        rect3.currentColor = "notOver";
-    }
-    //rect 3
-    else if (400 < mouseX < 600) {
-        rect3.currentColor = "over";
-        rect1.currentColor = "notOver";
-        rect2.currentColor = "notOver";
-    }
-
-}
