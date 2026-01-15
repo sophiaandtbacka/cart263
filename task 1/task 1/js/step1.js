@@ -1,5 +1,5 @@
 "use strict";
-const ellipses = {
+let ellipses = {
     x: 100,
     y: 200,
     w: 50,
