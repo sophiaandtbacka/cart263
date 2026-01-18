@@ -6,59 +6,78 @@ let counter = {
     value: 0,
 }
 
+//orange square
 const square = {
     x: 150,
     y: 150,
     w: 50,
     h: 50,
     color: {
-        r: 150,
-        g: 230,
-        b: 70,
+        highlighted: {
+            r: 255,
+            g: 191,
+            b: 0,
+        },
+        notHighlighted: {
+            r: 242,
+            g: 140,
+            b: 40,
+        }
     },
+    over: false,
 }
 
-let ellipse = {
+//circle constant values
+const circle = {
     x: 300,
     y: 300,
-    s: 300,
+    color: {//left in rgb format incase want to change color in the future
+        r: 255,
+        g: 255,
+        b: 255,
+    }
 }
+
+let overlap;//mouse over square variable
 
 function setup() {
     console.log("go");
     createCanvas(600, 600);
-
 };
 
 function draw() {
+    background("black");
 
+    checkCollisionWithSquare();
     displaySquare();
+    drawCircles();
 
 }
 
-//draws square
+//draws orange square, controls color change
 function displaySquare() {
     noStroke();
-    fill(square.color.r, square.color.g, square.color.b);
+    if (overlap === true) {
+        fill(square.color.highlighted.r, square.color.highlighted.g, square.color.highlighted.b);
+    }
+    else {
+        fill(square.color.notHighlighted.r, square.color.notHighlighted.g, square.color.notHighlighted.b);
+    }
     rect(square.x, square.y, square.w, square.h);
 }
 
-//if click square then counter
+//if click square then counter goes up
 function mousePressed() {
     // Check if the click was inside the square
-    const d = dist(mouseX, mouseY, square.x, square.y);
-    const overlap = (d < square.w / 2);
-
-    if (overlap) {
+    if (overlap === true) {
         counter.value++;
         console.log(counter.value);
     }
 }
 
+//checks if mouse over square
 function checkCollisionWithSquare() {
-    const d = dist(mouseX, mouseY, square.x, square.y);
-
-    if (d < square.w / 2) {
+    if (mouseX >= square.x && mouseX <= square.x + square.w && mouseY >= square.y && mouseY <= square.y + square.h) {
         overlap = true;
     }
     else {
@@ -66,6 +85,24 @@ function checkCollisionWithSquare() {
     };
 }
 
-function drawEllipse() {
-    ellipse(ellipse.x, ellipse.y, ellipse.s);
+//draws individual circles
+function drawCircle(ellipseRadius, ellipseAlpha) {
+    fill(circle.color.r, circle.color.g, circle.color.b, ellipseAlpha);
+    ellipse(circle.x, circle.y, ellipseRadius);
+}
+
+//draws all circles
+function drawCircles() {
+    if (counter.value < 10 && counter.value > 1) {
+        let ellipseRadius = 75;
+        let ellipseAlpha = 0;
+        let i = 0;
+
+        while (i < counter.value) {
+            drawCircle(ellipseRadius, ellipseAlpha);
+            ellipseRadius += 25;
+            ellipseAlpha += 10;
+            i++;
+        }
+    }
 }
