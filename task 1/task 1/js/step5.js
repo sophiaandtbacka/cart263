@@ -1,5 +1,4 @@
 "use strict";
-//started didn't finish
 
 
 let counter = {
