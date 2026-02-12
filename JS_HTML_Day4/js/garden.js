@@ -31,17 +31,6 @@ window.onload = function () {
             //the sky element
             skyDiv: document.createElement("div"),
         },
-
-        /*sun object */
-        sun: {
-            sunColor: {
-                r: 240,
-                g: 206,
-                b: 83,
-            },
-            //the sun element
-            sunDiv: document.createElement("div"),
-        },
     };
 
 
@@ -56,15 +45,6 @@ window.onload = function () {
         )`;
         document.getElementsByTagName("main")[0].appendChild(garden.sky.skyDiv);
 
-        //sun - IN the sky
-        garden.sun.sunDiv.classList.add("sun");
-        garden.sun.sunDiv.style.background = `rgb(
-        ${garden.sun.sunColor.r},
-        ${garden.sun.sunColor.g},
-        ${garden.sun.sunColor.b}
-        )`;
-        //append to the SKY div
-        document.getElementsByClassName("sky")[0].appendChild(garden.sun.sunDiv);
 
         //grass
         garden.grass.grassDiv.classList.add("grass");
@@ -77,10 +57,63 @@ window.onload = function () {
     }
 
 
-    /* render the sun, sky and grass*/
+    // /* render the sun, sky and grass*/
     createAndRenderTheGarden();
-    let flower = createFlower();
-    renderFlower(flower);
+    // let flower = createFlower();
+    // renderFlower(flower);
+
+
+    // // add numFlowers at one time
+    // for (let i = 0; i < garden.numFlowers; i++) {
+    //     garden.flowers.push(createFlower());
+    // }
+
+    // for (let i = 0; i < garden.flowers.length; i++) {
+    //     renderFlower(garden.flowers[i]);
+
+    // }
+
+
+    // let flower = new Flower()//ref flower class, new automatically calls constructor
+    // flower.renderFlower()
+
+
+    // Create our flowers by counting up to the number of the flowers
+
+    for (let i = 0; i < garden.numFlowers; i++) {
+        // Create variables for our arguments for clarity
+        let x = Math.random() * (window.innerWidth - 100);
+        let y = Math.random() * 120;
+        let size = Math.random() * 30 + 50;
+        let stemLength = Math.random() * 50 + 50;
+        let petalColor = {
+            r: parseInt(Math.random() * 155) + 100,
+            g: parseInt(Math.random() * 155) + 100,
+            b: parseInt(Math.random() * 155) + 100,
+        };
+
+        // Create a new flower using the arguments
+        let flower = new Flower(x, y, size, stemLength, petalColor);
+        // Add the flower to the array of flowers
+        garden.flowers.push(flower);
+    }
+
+    for (let i = 0; i < garden.flowers.length; i++) {
+        garden.flowers[i].renderFlower()
+    }
+
+
+    let sun = new Sun(10, 10, { r: 240, g: 206, b: 83 })
+    sun.renderSun();
+
+
+
+    window.addEventListener("keydown", function handleKeyDown(event) {
+        //call the handleKeyDown method in sun
+        //console.log(event.key);
+        sun.handleKeyDownInSUn(event);
+    });
+
 
 
 }
