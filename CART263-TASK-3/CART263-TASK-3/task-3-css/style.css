@@ -136,6 +136,27 @@ h5 {
 
 }
 
+.TEAM_A_ANI_A_particle {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: rgb(170, 29, 29);
+  position: absolute;
+}
+
+.TEAM_A_ANI_A_heartPoint {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: rgb(235, 24, 101);
+  position: absolute;
+}
+
+.arrow-heart {
+  position: absolute;
+  pointer-events: none;
+}
+
 /*CSS TEAM H**/
 
 .TEAM_H_box {
