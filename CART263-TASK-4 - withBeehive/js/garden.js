@@ -118,21 +118,6 @@ window.onload = function () {
         }
     }
 
-    //update with beehive
-    function updateGarden() {
-        for (let i = 0; i < garden.beeHive.length; i++) {
-            let beeHive = garden.beeHive[i];
-            beeHive.move();
-        }
-        window.requestAnimationFrame(updateGarden);
-    }
-
-    //bee hive animation
-    window.requestAnimationFrame(updateGarden);
-    function updateGarden() {
-        garden.beeHive.forEach(hive => hive.move());
-        requestAnimationFrame(updateGarden);
-    }
 
     createBeeHives();
     renderBeeHives();
@@ -196,6 +181,22 @@ window.onload = function () {
         }
     })
 
+
+    //update with beehive
+    function updateGarden() {
+        for (let i = 0; i < garden.beeHive.length; i++) {
+            let beeHive = garden.beeHive[i];
+            beeHive.move();
+        }
+        window.requestAnimationFrame(updateGarden);
+    }
+
+    //bee hive animation
+    window.requestAnimationFrame(updateGarden);
+    function updateGarden() {
+        garden.beeHive.forEach(hive => hive.move());
+        requestAnimationFrame(updateGarden);
+    }
 
 }
 
