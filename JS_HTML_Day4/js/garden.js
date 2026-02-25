@@ -1,13 +1,12 @@
-
-
 window.onload = function () {
     // Our garden
     let garden = {
-        // An array to store the individual flowers
-        flowers: [],
-        // How many flowers in the garden
-        numFlowers: 20,
-
+        // An array to store the individual birds
+        birds: [],
+        // How many birds in the garden
+        numBirds: 10,
+        numDogs: 10,
+        dogs: [],
         /*grass object */
         grass: {
             // The color of the grass (background)
@@ -32,89 +31,81 @@ window.onload = function () {
             skyDiv: document.createElement("div"),
         },
     };
-
+    // new  sun instancce
+    let sun = new Sun(10, 10, { r: 240, g: 206, b: 83 })
 
     function createAndRenderTheGarden() {
         /* note how we use dot notation....*/
         //sky
         garden.sky.skyDiv.classList.add("sky");
-        garden.sky.skyDiv.style.background = `rgb(
-        ${garden.sky.skyColor.r},
-        ${garden.sky.skyColor.g},
-        ${garden.sky.skyColor.b}
-        )`;
+        garden.sky.skyDiv.style.background = `rgb(${garden.sky.skyColor.r},${garden.sky.skyColor.g},${garden.sky.skyColor.b})`;
         document.getElementsByTagName("main")[0].appendChild(garden.sky.skyDiv);
-
+        //sun
+        sun.renderSun();
 
         //grass
         garden.grass.grassDiv.classList.add("grass");
-        garden.grass.grassDiv.style.background = `rgb(
-        ${garden.grass.grassColor.r},
-        ${garden.grass.grassColor.g},
-        ${garden.grass.grassColor.b}
-        )`;
+        garden.grass.grassDiv.style.background = `rgb(${garden.grass.grassColor.r},${garden.grass.grassColor.g},${garden.grass.grassColor.b})`;
         document.getElementsByTagName("main")[0].appendChild(garden.grass.grassDiv);
+
+
+
     }
 
+    function createDogs() {
+        // Create the correct number of dogs and put them in our array
+        for (let i = 0; i < garden.numDogs; i++) {
+            let x = Math.random() * window.innerWidth;
+            let y = Math.random() * 100;
+            let dog = new Dog(x, y, 15, 15); // the constructor of the dog class is called once the key word "new" is called.
+            garden.dogs.push(dog);
+        }
 
-    // /* render the sun, sky and grass*/
+    }
+    function createBirds() {
+        //create some birds
+        for (let i = 0; i < garden.numBirds; i++) {
+            let x = Math.random() * window.innerWidth;
+            let y = Math.random() * 100;
+            let bird = new Bird(x, y, 15, 15);
+            garden.birds.push(bird);
+        }
+    }
+
+    function renderAnimals() {
+        // Go through all the animals and move, wrap, and display them
+        for (let i = 0; i < garden.dogs.length; i++) {
+            let dog = garden.dogs[i];
+            dog.renderAnimal();
+        }
+        // Go through all the birds and move, wrap, and display them
+        for (let i = 0; i < garden.birds.length; i++) {
+            let bird = garden.birds[i];
+            bird.renderAnimal();
+        }
+    }
+
     createAndRenderTheGarden();
-    // let flower = createFlower();
-    // renderFlower(flower);
+    createDogs();
+    createBirds();
+    renderAnimals();
 
+    window.requestAnimationFrame(updateGarden);
 
-    // // add numFlowers at one time
-    // for (let i = 0; i < garden.numFlowers; i++) {
-    //     garden.flowers.push(createFlower());
-    // }
+    function updateGarden() {
+        // Go through all the animals and move, wrap, and display them
+        for (let i = 0; i < garden.dogs.length; i++) {
+            let dog = garden.dogs[i];
+            dog.move();
+            dog.wrap();
 
-    // for (let i = 0; i < garden.flowers.length; i++) {
-    //     renderFlower(garden.flowers[i]);
-
-    // }
-
-
-    // let flower = new Flower()//ref flower class, new automatically calls constructor
-    // flower.renderFlower()
-
-
-    // Create our flowers by counting up to the number of the flowers
-
-    for (let i = 0; i < garden.numFlowers; i++) {
-        // Create variables for our arguments for clarity
-        let x = Math.random() * (window.innerWidth - 100);
-        let y = Math.random() * 120;
-        let size = Math.random() * 30 + 50;
-        let stemLength = Math.random() * 50 + 50;
-        let petalColor = {
-            r: parseInt(Math.random() * 155) + 100,
-            g: parseInt(Math.random() * 155) + 100,
-            b: parseInt(Math.random() * 155) + 100,
-        };
-
-        // Create a new flower using the arguments
-        let flower = new Flower(x, y, size, stemLength, petalColor);
-        // Add the flower to the array of flowers
-        garden.flowers.push(flower);
+        }
+        // Go through all the birds and move, wrap, and display them
+        for (let i = 0; i < garden.birds.length; i++) {
+            let bird = garden.birds[i];
+            bird.move();
+            bird.wrap();
+        }
+        window.requestAnimationFrame(updateGarden);
     }
-
-    for (let i = 0; i < garden.flowers.length; i++) {
-        garden.flowers[i].renderFlower()
-    }
-
-
-    let sun = new Sun(10, 10, { r: 240, g: 206, b: 83 })
-    sun.renderSun();
-
-
-
-    window.addEventListener("keydown", function handleKeyDown(event) {
-        //call the handleKeyDown method in sun
-        //console.log(event.key);
-        sun.handleKeyDownInSUn(event);
-    });
-
-
-
 }
-

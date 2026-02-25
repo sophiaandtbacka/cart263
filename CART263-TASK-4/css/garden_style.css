@@ -42,10 +42,3 @@ body {
     position: absolute;
     border-style: solid;
 }
-
-.animal {
-    padding: 0;
-    margin: 0;
-    position: absolute;
-    background-color: crimson;
-}
