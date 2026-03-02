@@ -1,0 +1,29 @@
+/* full black screen */
+body {
+    margin: 0;
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: black;
+    font-family: sans-serif;
+}
+
+/* button style */
+#locBtn {
+    padding: 18px 32px;
+    font-size: 18px;
+
+    border: none;
+    border-radius: 12px;
+
+    cursor: pointer;
+    background: white;
+    transition: transform 0.15s ease;
+}
+
+#locBtn:hover {
+    transform: scale(1.05);
+}

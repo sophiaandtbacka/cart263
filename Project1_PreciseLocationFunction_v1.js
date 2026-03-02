@@ -3,7 +3,7 @@ class Beehive {
         this.x = x;
         this.y = y;
         this.width = width;
-        this.height = height;
+        this.height = heigh
         this.hiveDiv = document.createElement("img");
         // Rotation increment
         this.rotationInc = (Math.random() * (0.8 - 0.6)) + 0.6;
