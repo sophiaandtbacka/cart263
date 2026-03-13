@@ -3,6 +3,7 @@ window.onload = function () {
         galleryStars: [], //stars array
         numGalleryStars: 35, //amount of stars generated
 
+        galleryStarFrame: [],
 
     };
 
@@ -51,5 +52,40 @@ window.onload = function () {
     renderGalleryStars();
     animateGalleryStars();
 
+
+
+    function createGalleryStarFrame() {
+        //create star frame
+
+        //defines stars' variables
+        let x = window.innerWidth / 2;
+        let y = window.innerHeight / 2;
+        let w = 500;
+        let h = 500;
+
+        //color of stars
+        // let tint = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;//does random color change with 100% opacity on mask tint layer
+        let graffitiOpacity = `rgb(${255}, ${255}, ${255})`;//makes stars white
+
+        //creates stars
+        let starFrame = new galleryStarFrame(x, y, w, h, graffitiOpacity);
+
+        //puts info of created stars in array
+        gallery.galleryStarFrame.push(starFrame);//pushes bee into bees array
+
+    }
+
+    //draws all the stars on the gallery page background
+    function renderGalleryStarFrame() {
+        // renders all stars, set num of stars at top in gallery
+
+        let starFrame = gallery.galleryStarFrame[0];
+        starFrame.renderGalleryStars();
+
+    }
+
+    //calls all functions for Gallery Star Frame
+    createGalleryStarFrame();
+    renderGalleryStarFrame();
 
 }
