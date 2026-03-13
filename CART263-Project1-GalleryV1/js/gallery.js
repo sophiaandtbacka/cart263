@@ -2,6 +2,8 @@ window.onload = function () {
     let gallery = {
         galleryStars: [], //stars array
         numGalleryStars: 35, //amount of stars generated
+
+
     };
 
     //creates all of stars on the gallery page background
@@ -16,7 +18,7 @@ window.onload = function () {
 
             //color of stars
             // let tint = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;//does random color change with 100% opacity on mask tint layer
-            let tint = `rgb(${255}, ${255}, ${255})`
+            let tint = `rgb(${255}, ${255}, ${255})`;//makes stars white
 
             //creates stars
             let star = new galleryStar(x, y, w, h, tint);

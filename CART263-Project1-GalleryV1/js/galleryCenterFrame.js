@@ -5,7 +5,7 @@ document.addEventListener("mousemove", function (event) {
 });
 
 //Background gallery stars
-class galleryStar {
+class galleryCenterFrame {
     constructor(x, y, width, height, tintColor) {
         //variables given value when calling function
         this.x = x;
