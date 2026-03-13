@@ -1,4 +1,5 @@
 //Tracking Mouse Movement
+//Need to put here b/c this is the first doc that loads in the html
 let mouseX = 0;
 document.addEventListener("mousemove", function (event) {
     mouseX = event.clientX;

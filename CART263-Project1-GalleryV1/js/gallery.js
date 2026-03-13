@@ -64,8 +64,7 @@ window.onload = function () {
         let h = 500;
 
         //color of stars
-        // let tint = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;//does random color change with 100% opacity on mask tint layer
-        let graffitiOpacity = `rgb(${255}, ${255}, ${255})`;//makes stars white
+        let graffitiOpacity = 1;//makes full opacity
 
         //creates stars
         let starFrame = new galleryStarFrame(x, y, w, h, graffitiOpacity);

@@ -36,27 +36,20 @@ class galleryStarFrame {
         starImg.style.objectFit = "contain";
         starImg.style.position = "absolute"; // Stack it inside the wrapper
 
-        // Tinted overlay, for color change if you want to use it 
-        let graffitiLayer = document.createElement("div");
+        // graffiti img layer
+        let graffitiLayer = document.createElement("img");
+        graffitiLayer.src = "./media/starFrameFill.png";
         graffitiLayer.style.width = "100%";
         graffitiLayer.style.height = "100%";
-        graffitiLayer.style.position = "absolute"; // Stack exactly on top of the image
+        graffitiLayer.style.objectFit = "contain";
+        graffitiLayer.style.position = "absolute";
 
-        // Apply the color from the constructor parameter
-        graffitiLayer.style.backgroundColor = this.graffitiOpacity;
-
-        // Mask out the background so that only the star is colored
-        graffitiLayer.style.maskImage = "url('./media/starFrameFill.png')";
-        graffitiLayer.style.maskSize = "contain";
-        graffitiLayer.style.maskRepeat = "no-repeat";//masks it so there isn't multiple masks
-        graffitiLayer.style.maskPosition = "center";//centers the mask over the image
-
-        // Blend the tint and star colors
-        graffitiLayer.style.mixBlendMode = "multiply";
+        graffitiLayer.style.opacity = this.graffitiOpacity;//make opacity changeable
 
         // Put it all together
-        this.body.appendChild(starImg);
         this.body.appendChild(graffitiLayer);
+        this.body.appendChild(starImg);
+
         document.getElementsByTagName("main")[0].appendChild(this.body);
     }
 
