@@ -5,6 +5,8 @@ window.onload = function () {
 
         galleryStarFrame: [],
 
+        galleryCircleCursor: [],
+
     };
 
     //creates all of stars on the gallery page background
@@ -87,4 +89,35 @@ window.onload = function () {
     createGalleryStarFrame();
     renderGalleryStarFrame();
 
+
+
+    function createGalleryCircleCursor() {
+        let x = mouseX;
+        let y = mouseY;
+        let w = 100;
+        let h = 100;
+        let r = 50;
+
+        let circleCursor = new galleryCircleCursor(x, y, w, h, r);
+
+        gallery.galleryCircleCursor.push(circleCursor);//pushes bee into bees array
+
+    }
+
+    function renderGalleryCircleCursor() {
+        let circleCursor = gallery.galleryCircleCursor[0];
+        let starFrame = gallery.galleryStarFrame[0];
+
+        circleCursor.renderGalleryCircleCursor();
+        circleCursor.animateGalleryCircleCursor(starFrame.graffitiLayer);
+    }
+
+    createGalleryCircleCursor()
+    renderGalleryCircleCursor()
+
+    let starFrame = gallery.galleryStarFrame[0];
+    let cursor = gallery.galleryCircleCursor[0];
+
+    cursor.renderGalleryCircleCursor();
+    cursor.animateGalleryCircleCursor(starFrame.graffitiLayer);
 }
