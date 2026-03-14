@@ -5,7 +5,7 @@ window.onload = function () {
 
         galleryStarFrame: [],
 
-        galleryCircleCursor: [],
+        galleryCircleCursor: [],//only one created
 
     };
 
@@ -20,8 +20,7 @@ window.onload = function () {
             let h = Math.floor(Math.random() * 5 + 1) * 20;
 
             //color of stars
-            // let tint = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;//does random color change with 100% opacity on mask tint layer
-            let tint = `rgb(${255}, ${255}, ${255})`;//makes stars white
+            let tint = `rgb(${18}, ${20}, ${255})`;//does random color change with 100% opacity on mask tint layer
 
             //creates stars
             let star = new galleryStar(x, y, w, h, tint);
@@ -55,34 +54,19 @@ window.onload = function () {
     animateGalleryStars();
 
 
-
+    //creates star frame
     function createGalleryStarFrame() {
-        //create star frame
-
-        //defines stars' variables
-        let x = window.innerWidth / 2;
-        let y = window.innerHeight / 2;
-        let w = 500;
-        let h = 500;
-
-        //color of stars
-        let graffitiOpacity = 1;//makes full opacity
-
-        //creates stars
-        let starFrame = new galleryStarFrame(x, y, w, h, graffitiOpacity);
-
-        //puts info of created stars in array
-        gallery.galleryStarFrame.push(starFrame);//pushes bee into bees array
-
+        //creates star frame
+        let starFrame = new galleryStarFrame();
+        //puts info of created star frame in array
+        gallery.galleryStarFrame.push(starFrame);
     }
 
-    //draws all the stars on the gallery page background
+    //draws star frame on gallery page
     function renderGalleryStarFrame() {
         // renders all stars, set num of stars at top in gallery
-
-        let starFrame = gallery.galleryStarFrame[0];
+        let starFrame = gallery.galleryStarFrame[0];//0 because only one star frame is created
         starFrame.renderGalleryStars();
-
     }
 
     //calls all functions for Gallery Star Frame
@@ -100,7 +84,7 @@ window.onload = function () {
 
         let circleCursor = new galleryCircleCursor(x, y, w, h, r);
 
-        gallery.galleryCircleCursor.push(circleCursor);//pushes bee into bees array
+        gallery.galleryCircleCursor.push(circleCursor);
 
     }
 
@@ -115,9 +99,5 @@ window.onload = function () {
     createGalleryCircleCursor()
     renderGalleryCircleCursor()
 
-    let starFrame = gallery.galleryStarFrame[0];
-    let cursor = gallery.galleryCircleCursor[0];
 
-    cursor.renderGalleryCircleCursor();
-    cursor.animateGalleryCircleCursor(starFrame.graffitiLayer);
 }
