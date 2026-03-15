@@ -15,7 +15,7 @@ body {
     /*makes left edge of div in center of screen*/
     left: 50%;
     /*make top edge the center of the space under the nav bar, nav bar width is 70px*/
-    top: calc(70px + (100vh - 70px) / 2);
+    top: calc(60px + ((100vh - 60px) / 2));
 
     /*adjust div mapping from top left corner to the center of the div*/
     transform: translate(-50%, -50%);
