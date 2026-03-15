@@ -7,6 +7,7 @@ document.addEventListener("mousemove", function (event) {
     mouseY = event.clientY;
 });
 
+
 //Background gallery stars
 class galleryStar {
     constructor(x, y, width, height, tintColor) {
@@ -33,6 +34,7 @@ class galleryStar {
         this.body.style.height = this.height + "px";
         this.body.style.left = this.x + "px";
         this.body.style.top = this.y + "px";
+        this.body.style.zIndex = "1"; // stars are background
 
         // star image
         let starImg = document.createElement("img");
@@ -68,10 +70,23 @@ class galleryStar {
 
     animateGalleryStars() {
         //velocitiy for stars, only x change right now
-        if (mouseX < 350 || mouseX > (window.innerWidth - 350)) {
-            this.vx = Math.random() * 1.1 + 0.1;
+        if (centerStarFrame) {
+            let rect = centerStarFrame.body.getBoundingClientRect();
+
+            let mouseOverStar =
+                mouseX > rect.left &&
+                mouseX < rect.right &&
+                mouseY > rect.top &&
+                mouseY < rect.bottom;
+
+            if (mouseOverStar) {
+                this.vx = 0;
+            }
+            else {
+                this.vx = Math.random() * 1.1 + 0.1;
+            }
         }
-        else { this.vx = 0; }
+
 
         //updates x position with velocity
         this.x += this.vx;

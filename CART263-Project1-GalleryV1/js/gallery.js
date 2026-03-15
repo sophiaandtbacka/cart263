@@ -1,13 +1,63 @@
+let centerStarFrame;
+
 window.onload = function () {
     let gallery = {
         galleryStars: [], //stars array
-        numGalleryStars: 35, //amount of stars generated
+        numGalleryStars: 5, //amount of stars generated
 
-        galleryStarFrame: [],
+        galleryStarFrame: [],//only one created
 
         galleryCircleCursor: [],//only one created
 
     };
+
+    //creates star frame
+    function createGalleryStarFrame() {
+        //creates star frame
+        let starFrame = new galleryStarFrame();
+        //puts info of created star frame in array
+        gallery.galleryStarFrame.push(starFrame);
+
+        // assign global reference for background stars
+        centerStarFrame = starFrame;
+    }
+
+    //draws star frame on gallery page
+    function renderGalleryStarFrame() {
+        // renders all stars, set num of stars at top in gallery
+        let starFrame = gallery.galleryStarFrame[0];//0 because only one star frame is created
+        starFrame.renderGalleryStars();
+    }
+
+    //calls all functions for Gallery Star Frame
+    createGalleryStarFrame();
+    renderGalleryStarFrame();
+
+
+
+    function createGalleryCircleCursor() {
+        let x = mouseX;
+        let y = mouseY;
+        let w = 100;
+        let h = 100;
+        let r = 50;
+
+        let circleCursor = new galleryCircleCursor(x, y, w, h, r);
+
+        gallery.galleryCircleCursor.push(circleCursor);
+
+    }
+
+    function renderGalleryCircleCursor() {
+        let circleCursor = gallery.galleryCircleCursor[0];
+        let starFrame = gallery.galleryStarFrame[0];
+
+        circleCursor.renderGalleryCircleCursor();
+        circleCursor.animateGalleryCircleCursor(starFrame.graffitiLayer);
+    }
+
+    createGalleryCircleCursor()
+    renderGalleryCircleCursor()
 
     //creates all of stars on the gallery page background
     function createGalleryStars() {
@@ -48,56 +98,18 @@ window.onload = function () {
         }
     }
 
+
+
     //calls all functions for Gallery Background Stars
     createGalleryStars();
     renderGalleryStars();
     animateGalleryStars();
 
+    // use the global centerStarFrame
+    centerStarFrame = new galleryStarFrame();
+    centerStarFrame.renderGalleryStars();
 
-    //creates star frame
-    function createGalleryStarFrame() {
-        //creates star frame
-        let starFrame = new galleryStarFrame();
-        //puts info of created star frame in array
-        gallery.galleryStarFrame.push(starFrame);
-    }
-
-    //draws star frame on gallery page
-    function renderGalleryStarFrame() {
-        // renders all stars, set num of stars at top in gallery
-        let starFrame = gallery.galleryStarFrame[0];//0 because only one star frame is created
-        starFrame.renderGalleryStars();
-    }
-
-    //calls all functions for Gallery Star Frame
-    createGalleryStarFrame();
-    renderGalleryStarFrame();
-
-
-
-    function createGalleryCircleCursor() {
-        let x = mouseX;
-        let y = mouseY;
-        let w = 100;
-        let h = 100;
-        let r = 50;
-
-        let circleCursor = new galleryCircleCursor(x, y, w, h, r);
-
-        gallery.galleryCircleCursor.push(circleCursor);
-
-    }
-
-    function renderGalleryCircleCursor() {
-        let circleCursor = gallery.galleryCircleCursor[0];
-        let starFrame = gallery.galleryStarFrame[0];
-
-        circleCursor.renderGalleryCircleCursor();
-        circleCursor.animateGalleryCircleCursor(starFrame.graffitiLayer);
-    }
-
-    createGalleryCircleCursor()
-    renderGalleryCircleCursor()
-
+    // create the grid after rendering the star frame
+    const grid = new Grid(centerStarFrame, 40, 30);
 
 }

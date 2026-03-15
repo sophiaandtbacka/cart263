@@ -5,6 +5,7 @@ class galleryStarFrame {
 
         // Make the wrapper div
         this.body = document.createElement("div");
+
     }
 
 
@@ -33,5 +34,6 @@ class galleryStarFrame {
 
         document.querySelector("main").appendChild(this.body);
     }
+
 
 }
