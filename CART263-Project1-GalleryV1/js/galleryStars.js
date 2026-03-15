@@ -25,7 +25,7 @@ class galleryStar {
 
 
 
-    // Since I uploaded a PNG and we need to modify the color, I'll create a tint layer and mask out the transparent background
+    // Uploaded a PNG and create a tint layer to modify the color
     renderGalleryStars() {
         // Wrapper div
         this.body.classList.add("star");
@@ -34,15 +34,15 @@ class galleryStar {
         this.body.style.height = this.height + "px";
         this.body.style.left = this.x + "px";
         this.body.style.top = this.y + "px";
-        this.body.style.zIndex = "1"; // stars are background
+        this.body.style.zIndex = "1"; //stars are arranged in background now
 
         // star image
-        let starImg = document.createElement("img");
-        starImg.src = "./media/star.png";
-        starImg.style.width = "100%";
-        starImg.style.height = "100%";
-        starImg.style.objectFit = "contain";
-        starImg.style.position = "absolute"; // Stack it inside the wrapper
+        let starImg = document.createElement("img");//creates star img div
+        starImg.src = "./media/star.png";//star img route
+        starImg.style.width = "100%";//img fills the entire div container
+        starImg.style.height = "100%";//img fills the entire div container
+        starImg.style.objectFit = "contain";//maintains aspect ratio of original img asset
+        starImg.style.position = "absolute"; // Stack it on top the wrapper
 
         // Tinted overlay, for color change if you want to use it 
         let tintLayer = document.createElement("div");
@@ -59,7 +59,7 @@ class galleryStar {
         tintLayer.style.maskRepeat = "no-repeat";//masks it so there isn't multiple masks
         tintLayer.style.maskPosition = "center";//centers the mask over the image
 
-        // Blend the tint and star colors
+        // Blend the tint and star original color
         tintLayer.style.mixBlendMode = "multiply";
 
         // Put it all together
@@ -73,25 +73,25 @@ class galleryStar {
         if (centerStarFrame) {
             let rect = centerStarFrame.body.getBoundingClientRect();
 
+            //area over center star frame
             let mouseOverStar =
                 mouseX > rect.left &&
                 mouseX < rect.right &&
                 mouseY > rect.top &&
                 mouseY < rect.bottom;
 
-            if (mouseOverStar) {
+            if (mouseOverStar) {//stops background star animation when mouse over center star frame
                 this.vx = 0;
             }
-            else {
+            else {//starts background star animation when mouse not over center star frame
                 this.vx = Math.random() * 1.1 + 0.1;
             }
         }
 
-
         //updates x position with velocity
         this.x += this.vx;
 
-        //update div position
+        //update div position with animation
         this.body.style.left = this.x + "px";
         this.body.style.top = this.y + "px";
 

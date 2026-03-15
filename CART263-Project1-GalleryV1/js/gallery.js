@@ -3,7 +3,7 @@ let centerStarFrame;
 window.onload = function () {
     let gallery = {
         galleryStars: [], //stars array
-        numGalleryStars: 5, //amount of stars generated
+        numGalleryStars: 195, //amount of stars generated
 
         galleryStarFrame: [],//only one created
 
@@ -105,11 +105,13 @@ window.onload = function () {
     renderGalleryStars();
     animateGalleryStars();
 
-    // use the global centerStarFrame
-    centerStarFrame = new galleryStarFrame();
-    centerStarFrame.renderGalleryStars();
 
-    // create the grid after rendering the star frame
-    const grid = new Grid(centerStarFrame, 40, 30);
+    function renderGlow() {
+        // create the grid after rendering the star frame
+        const grid = new Grid(gallery.galleryStarFrame[0], 14, 30);
+    }
+
+    renderGlow();
+
 
 }

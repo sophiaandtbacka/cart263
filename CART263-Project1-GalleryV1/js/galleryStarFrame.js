@@ -2,20 +2,17 @@
 //Background gallery stars
 class galleryStarFrame {
     constructor() {
-
-        // Make the wrapper div
+        // Makes the div for the center stars
         this.body = document.createElement("div");
-
     }
 
 
-
-    // Since I uploaded a PNG and we need to modify the color, I'll create a tint layer and mask out the transparent background
+    // four levels general div, white background, graffiti fill, star outline
     renderGalleryStars() {
         // Wrapper div
         this.body.classList.add("starFrame");
 
-        // white star background layer, masks animated star
+        // white star background img layer, masks animated background stars, needs to be an img layer b/c otherwise rect div preemptively masks animated stars
         this.backgroundLayer = document.createElement("img");//makes an img element, controled by css .starFrame img
         this.backgroundLayer.src = "./media/starFrameBackground.png";//gives the white background img location
 
@@ -23,7 +20,7 @@ class galleryStarFrame {
         this.graffitiLayer = document.createElement("img");//makes an img element, controled by css .starFrame img
         this.graffitiLayer.src = "./media/starFrameFill.png";//gives the graffiti fill img location
 
-        // star image
+        // star outline img layer
         this.outlineLayer = document.createElement("img");//makes an img element, controled by css .starFrame img
         this.outlineLayer.src = "./media/starFrame.png";//gives the star outline img location
 

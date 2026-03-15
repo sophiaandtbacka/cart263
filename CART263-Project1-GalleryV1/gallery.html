@@ -15,8 +15,128 @@
 
 <body>
     <main>
+        <div class="topnav">
+            <a class="active" href="#home">LOGO</a>
+            <a href="#news">ABOUT</a>
+            <a href="#contact">GALLERY</a>
+        </div>
+
 
     </main>
 </body>
+<script>
+    // Create navbar div
+    const navDiv = document.createElement("div");
+    navDiv.id = "topnav";
+    navDiv.style.position = "absolute"; // position it on top
+    navDiv.style.top = "0"; // top of the page/container
+    navDiv.style.left = "0"; // align left
+    navDiv.style.width = "100%";
+    navDiv.style.height = "auto"; // full width
+    navDiv.style.zIndex = "1000"; // make sure it's above the map
+
+    // Create image
+    const navImg = document.createElement("img");
+    navImg.src = "assets/mpassets/taskbara.png"; // make sure path is correct
+    navImg.alt = "Navbar background";
+    navImg.style.width = "100%";
+    navImg.style.height = "auto";
+    navImg.style.display = "block";
+
+    // Add image to div
+    navDiv.appendChild(navImg);
+
+    // Add navbar to the body (on top of map)
+    document.body.appendChild(navDiv); // comment out to hide search bar
+
+    // nav buttons
+    // Logo
+    const logo = document.createElement("div");
+    logo.id = "logo";
+    navDiv.appendChild(logo);
+
+    logo.style.width = "100px";
+    logo.style.height = "60px";
+    logo.style.padding = "0";
+    logo.style.top = "0"; // near bottom of the parent/div
+    logo.style.left = "2%"; // position from left
+    logo.style.border = "none"; // remove default border
+    logo.style.background = "none"; // remove default button background
+    logo.style.cursor = "pointer"; // pointer on hover
+    logo.style.position = "absolute"; // overlay
+    logo.style.backgroundColor = "none";
+    logo.style.zIndex = "30"
+
+    logo.onclick = function () { // direct to new page
+        window.location.href = "index.html";
+    };
+
+    // About
+    const about = document.createElement("button");
+    about.id = "about-btn";
+    navDiv.appendChild(about);
+    // Set the size and position
+    about.style.width = "10%";
+    about.style.height = "auto";
+    about.style.padding = "0";
+    about.style.top = "20%"; // near bottom of the parent/div
+    about.style.left = "49%"; // position from left
+    about.style.border = "none"; // remove default border
+    about.style.background = "none"; // remove default button background
+    about.style.cursor = "pointer"; // pointer on hover
+    about.style.position = "absolute"; // overlay
+
+    // Add the image inside the gmap button
+    const aboutImg = document.createElement("img");
+    aboutImg.src = "assets/mpassets/about.png"; // your image path
+    aboutImg.style.width = "100%"; // fills the button width
+    aboutImg.style.height = "auto"; // fills the button height
+    aboutImg.style.display = "block"; // removes inline spacing
+    about.appendChild(aboutImg);
+
+    // Hover photo
+    about.addEventListener("mouseenter", () => {
+        aboutImg.src = "assets/mpassets/hoverabout.png"; // image to show on hover
+    });
+    about.addEventListener("mouseleave", () => {
+        aboutImg.src = "assets/mpassets/about.png"; // revert back
+    });
+
+
+    // Gallery
+    const gallery = document.createElement("button");
+    gallery.id = "gallery-btn";
+    navDiv.appendChild(gallery);
+
+    // Set the size and position
+    gallery.style.width = "10%";
+    gallery.style.height = "auto";
+    gallery.style.padding = "0";
+    gallery.style.top = "20%"; // near bottom of the parent/div
+    gallery.style.left = "40%"; // position from left
+    gallery.style.border = "none"; // remove default border
+    gallery.style.background = "none"; // remove default button background
+    gallery.style.cursor = "pointer"; // pointer on hover
+    gallery.style.position = "absolute"; // overlay
+
+    // Add the image inside the gallery button
+    const galleryImg = document.createElement("img");
+    galleryImg.src = "assets/mpassets/gallery.png"; // updated image path
+    galleryImg.style.width = "100%"; // fills the button width
+    galleryImg.style.height = "auto"; // fills the button height
+    galleryImg.style.display = "block"; // removes inline spacing
+
+    gallery.appendChild(galleryImg);
+
+
+    // Hover photo
+    gallery.addEventListener("mouseenter", () => {
+        galleryImg.src = "assets/mpassets/hovergallery.png"; // image to show on hover
+    });
+    gallery.addEventListener("mouseleave", () => {
+        galleryImg.src = "assets/mpassets/gallery.png"; // revert back
+    });
+
+</script>
 
 </html>

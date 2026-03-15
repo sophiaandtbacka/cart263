@@ -4,6 +4,41 @@ body {
     background-color: #ffffff;
 }
 
+/** 
+TOP NAVIGATION BAR 
+*/
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #ffff;
+    overflow: hidden;
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+    height: 45px;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+    float: left;
+    color: #000000;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+    background-color: #000000;
+    color: rgb(255, 255, 255);
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+    background-color: #0044ff;
+    color: white;
+}
+
 /*do in css so if there is browser resizing the star keeps the same ratio*/
 .starFrame {
     /*makes it so layering is possible*/
@@ -30,7 +65,5 @@ body {
 
 .gridCell {
     box-sizing: border-box;
-    margin: 0;
-    background-color: white;
     transition: background-color 0.1s, box-shadow 0.1s;
 }

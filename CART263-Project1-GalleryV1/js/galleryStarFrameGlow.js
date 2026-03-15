@@ -1,37 +1,40 @@
+//Everything to do with glow effect
 
-// GRID CELL
+//deals with individual cells
 class GridCell {
-    constructor(parent, size = 20) {
-        this.size = size;
-        this.body = document.createElement("div");
-        this.body.classList.add("gridCell");
-        this.body.style.width = this.size + "px";
-        this.body.style.height = this.size + "px";
-        this.body.style.backgroundColor = "white";
-        this.body.style.margin = "0"; // no gaps
-        this.body.style.boxSizing = "border-box";
+    constructor(parent, size = 5) {//default is cell size 5, parent is the container which is the gallery star frame div
+        this.size = size;//cell size
 
-        // append to parent container
+        this.body = document.createElement("div");//div created
+        this.body.classList.add("gridCell");//connects to gridCell css
+
+        this.body.style.width = this.size + "px";//makes square cells, width and height same
+        this.body.style.height = this.size + "px";//makes square cells, width and height same
+        this.body.style.backgroundColor = "white";
+
+        // append to parent container, which is starFrame
         parent.appendChild(this.body);
     }
 
-    updateEffect(mouseX, mouseY, maxDistance = 150) {
+    updateEffect(centerX, centerY, maxDistance = 150) {
         const rect = this.body.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
 
-        const dx = mouseX - centerX;
-        const dy = mouseY - centerY;
-        const distance = Math.sqrt(dx ** 2 + dy ** 2);
+        const cellX = rect.left + rect.width / 2;
+        const cellY = rect.top + rect.height / 2;
 
+        const dx = centerX - cellX;
+        const dy = centerY - cellY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        //intensity quotien
         const t = Math.max(0, Math.min(1, (maxDistance - distance) / maxDistance));
 
-        // box-shadow glow from white to blue
-        const glowIntensity = t * 15; // max 15px
+        //box-shadow glow from white to blue
+        const glowIntensity = t * 1; // max 15px
         const color = `rgba(0, 0, 255, ${t})`;
         this.body.style.boxShadow = `0 0 ${glowIntensity}px ${color}`;
 
-        // optional: also interpolate background
+        //interpolate background
         const r = 255 - t * 255;
         const g = 255 - t * 255;
         const b = 255;
@@ -39,7 +42,7 @@ class GridCell {
     }
 }
 
-// GRID MANAGER
+// deals with grid organization
 class Grid {
     constructor(centerStarFrame, cellSize = 20, margin = 30) {
         this.cells = [];
@@ -51,6 +54,10 @@ class Grid {
         this.startY = rect.top - margin;
         this.width = rect.width + margin * 2;
         this.height = rect.height + margin * 2;
+
+        // compute star center
+        this.centerX = rect.left + rect.width / 2;
+        this.centerY = rect.top + rect.height / 2;
 
         // create container div
         this.container = document.createElement("div");
@@ -81,7 +88,27 @@ class Grid {
     }
 
     animate() {
-        this.cells.forEach(cell => cell.updateEffect(mouseX, mouseY, 150));
+        // get the starFrame rectangle
+        const rect = centerStarFrame.body.getBoundingClientRect();
+
+        // check if mouse is inside the starFrame
+        const mouseInsideStarFrame =
+            mouseX >= rect.left &&
+            mouseX <= rect.right &&
+            mouseY >= rect.top &&
+            mouseY <= rect.bottom;
+
+        if (mouseInsideStarFrame) {
+            // run the glow effect
+            this.cells.forEach(cell => cell.updateEffect(mouseX, mouseY, 350));
+        } else {
+            // reset cells when mouse leaves the starFrame
+            this.cells.forEach(cell => {
+                cell.body.style.backgroundColor = "white";
+                cell.body.style.boxShadow = "none";
+            });
+        }
+
         requestAnimationFrame(() => this.animate());
     }
 }
