@@ -13,6 +13,7 @@ class galleryCircleCursor {
 
     renderGalleryCircleCursor() {
         this.body.style.position = "fixed";
+        // this.outlineLayer.style.zIndex = 100;
         this.body.style.width = this.width + "px";
         this.body.style.height = this.height + "px";
 
