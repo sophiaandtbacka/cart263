@@ -82,9 +82,11 @@ class galleryStar {
 
             if (mouseOverStar) {//stops background star animation when mouse over center star frame
                 this.vx = 0;
+                //hideNavbar();
             }
             else {//starts background star animation when mouse not over center star frame
                 this.vx = Math.random() * 1.1 + 0.1;
+                //showNavbar();
             }
         }
 

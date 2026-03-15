@@ -8,13 +8,19 @@ body {
 .starFrame {
     /*makes it so layering is possible*/
     position: absolute;
+
     /*makes it so star frame in front of background gallery stars*/
     z-index: 10;
+
+    /*makes left edge of div in center of screen*/
     left: 50%;
-    top: 50%;
+    /*make top edge the center of the space under the nav bar, nav bar width is 70px*/
+    top: calc(70px + (100vh - 70px) / 2);
+
+    /*adjust div mapping from top left corner to the center of the div*/
     transform: translate(-50%, -50%);
 
-
+    /*makes the star frame div take up 75% of the viewport*/
     width: 75vw;
     height: 75vh;
 }

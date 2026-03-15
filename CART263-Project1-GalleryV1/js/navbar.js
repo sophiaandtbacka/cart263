@@ -35,9 +35,11 @@ function createButton(id, imgSrc, hoverSrc, leftPosition, clickRedirect = null) 
     return btn;
 }
 
-// Navbar container
+
+// NAVBAR CONTAINER
 const navDiv = document.createElement("div");
 navDiv.id = "topnav";
+
 navDiv.style.position = "absolute";
 navDiv.style.top = "0";
 navDiv.style.left = "0";
@@ -45,44 +47,73 @@ navDiv.style.width = "100%";
 navDiv.style.height = "auto";
 navDiv.style.zIndex = "1000";
 
-// Background image
+/* smooth fade */
+navDiv.style.transition = "opacity 0.35s ease";
+
+
+// BACKGROUND IMAGE
 const navImg = document.createElement("img");
 navImg.src = "assets/mpassets/taskbara.png";
 navImg.alt = "Navbar background";
 navImg.style.width = "100%";
 navImg.style.height = "auto";
 navImg.style.display = "block";
+
 navDiv.appendChild(navImg);
 document.body.appendChild(navDiv);
 
-// Logo button (redirect to home/index)
+
+// LOGO BUTTON
 const logo = document.createElement("div");
 logo.id = "logo";
+
 logo.style.width = "100px";
 logo.style.height = "60px";
 logo.style.position = "absolute";
 logo.style.left = "2%";
 logo.style.top = "0";
 logo.style.cursor = "pointer";
+
 logo.onclick = () => window.location.href = "index.html";
+
 navDiv.appendChild(logo);
 
-// About button (redirects to about page)
+
+// ABOUT BUTTON
 const aboutBtn = createButton(
     "about-btn",
     "assets/mpassets/about.png",
     "assets/mpassets/hoverabout.png",
     "60%",
-    "about.html" // redirect to About page
+    "about.html"
 );
 navDiv.appendChild(aboutBtn);
 
-// Gallery button (redirects to gallery page)
+
+// GALLERY BUTTON
 const galleryBtn = createButton(
     "gallery-btn",
     "assets/mpassets/gallery.png",
     "assets/mpassets/hovergallery.png",
     "80%",
-    "gallery.html" // redirect to Gallery page
+    "gallery.html"
 );
 navDiv.appendChild(galleryBtn);
+
+
+
+/* ---------------------------------------------------
+   NAVBAR VISIBILITY CONTROLS (used by gallery system)
+   
+   doesn't work rn
+--------------------------------------------------- */
+
+window.hideNavbar = function () {
+    navDiv.style.opacity = "0";
+    navDiv.style.pointerEvents = "none";
+};
+
+window.showNavbar = function () {
+    navDiv.style.opacity = "1";
+    navDiv.style.pointerEvents = "auto";
+};
