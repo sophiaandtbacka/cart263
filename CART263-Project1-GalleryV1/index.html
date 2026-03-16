@@ -36,6 +36,51 @@
         <img src='assets/images/logo1.png'>
     </div>
 
+    <script>
+
+        // Create loading overlay
+        const loadingDiv = document.createElement("div");
+        loadingDiv.id = "loading-overlay";
+        document.body.appendChild(loadingDiv);
+
+        // styling 
+        loadingDiv.style.position = "fixed";
+        loadingDiv.style.top = "0";
+        loadingDiv.style.left = "0";
+        loadingDiv.style.width = "100%";
+        loadingDiv.style.height = "100%";
+        loadingDiv.style.background = "black";
+        loadingDiv.style.color = "white";
+        loadingDiv.style.display = "flex";
+        loadingDiv.style.justifyContent = "center";
+        loadingDiv.style.alignItems = "center";
+        loadingDiv.style.zIndex = "99";
+        loadingDiv.style.opacity = "1";
+        loadingDiv.style.backgroundColor = "white";
+
+
+        // time out loading screen
+        function fadeOut(div, duration = 100) {
+            let opacity = 1;
+            const interval = 50;
+            const decrement = interval / duration;
+
+            const fade = setInterval(() => {
+                opacity -= decrement;
+                div.style.opacity = opacity;
+                if (opacity <= 0) {
+                    clearInterval(fade);
+                    div.style.display = "none";
+                }
+            }, interval);
+        }
+
+        // fade out after 1 second
+        setTimeout(() => {
+            fadeOut(loadingDiv, 2000); // fade over 2 second
+        }, 1000);
+    </script>
+
 
 </body>
 

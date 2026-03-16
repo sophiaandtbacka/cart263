@@ -107,7 +107,8 @@
         logo.style.cursor = "pointer";  // pointer on hover
         logo.style.position = "absolute"; // overlay
         logo.style.backgroundColor = "none";
-        logo.style.zIndex = "30"
+        logo.style.zIndex = "30";
+        logo.backgroundImage = "url(https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyZHh0MmFpNXhsNDQxazcxaWFxaXU4YTV4bHBxbnR0ZmszaXRnNW1pbCZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/xT9IgzvnOyNDYnxeHS/200w.gif)";
 
         logo.onclick = function () { // direct to new page 
             window.location.href = "index.html";
@@ -144,6 +145,11 @@
             aboutImg.src = "assets/mpassets/about.png"; // revert back
         });
 
+        //click and redirect to about pg
+        about.onclick = function () {
+            window.location.href = "about.html";
+        };
+
 
         // Gallery 
         const gallery = document.createElement("button");
@@ -178,6 +184,11 @@
         gallery.addEventListener("mouseleave", () => {
             galleryImg.src = "assets/mpassets/gallery.png"; // revert back
         });
+
+        //click and redirect to gallery pg
+        gallery.onclick = function () {
+            window.location.href = "gallery.html";
+        };
 
         // Search 
 
@@ -215,6 +226,113 @@
         });
 
 
+
+        // loading error popup handler 
+        const errorDiv = document.createElement("div");
+        errorDiv.id = "error-popup";
+        document.body.appendChild(errorDiv)
+
+        // image 
+        const errorImg = document.createElement("img");
+        errorImg.src = "assets/mpassets/error.png"; // your search icon image path
+        errorImg.style.width = "50%";   // fills the button width
+        errorImg.style.height = "auto";  // fills the button height
+        errorImg.style.display = "block"; // removes inline spacing
+        errorDiv.appendChild(errorImg);
+
+
+        // stying 
+        errorDiv.style.visibility = "hidden";
+        // Apply styles
+        errorDiv.style.position = "fixed";
+        errorDiv.style.top = "0";
+        errorDiv.style.left = "0";
+        errorDiv.style.width = "100%";
+        errorDiv.style.height = "100%";
+        //errorDiv.style.background = "black";            // Background color
+        //errorDiv.style.backgroundColor = "blue";      // Optional: overrides black
+        errorDiv.style.color = "white";                // Text color
+        errorDiv.style.display = "flex";
+        errorDiv.style.justifyContent = "center";
+        errorDiv.style.alignItems = "center";
+        errorDiv.style.zIndex = "99";
+        errorDiv.style.opacity = "1";
+        ;
+
+
+
+        // Create loading overlay
+        const loadingDiv = document.createElement("div");
+        loadingDiv.id = "loading-overlay";
+        document.body.appendChild(loadingDiv);
+
+        // styling 
+        loadingDiv.style.position = "fixed";
+        loadingDiv.style.top = "0";
+        loadingDiv.style.left = "0";
+        loadingDiv.style.width = "100%";
+        loadingDiv.style.height = "100%";
+        loadingDiv.style.background = "black";
+        loadingDiv.style.color = "white";
+        loadingDiv.style.display = "flex";
+        loadingDiv.style.justifyContent = "center";
+        loadingDiv.style.alignItems = "center";
+        loadingDiv.style.zIndex = "99";
+        loadingDiv.style.opacity = "1";
+        loadingDiv.style.backgroundColor = "white";
+
+        // Set GIF as background
+        loadingDiv.style.backgroundImage = "url('')";
+        loadingDiv.style.backgroundSize = "cover";
+        loadingDiv.style.backgroundRepeat = "no-repeat";
+        loadingDiv.style.backgroundPosition = "center";
+
+
+        // Create a background div for the GIF (not being used)
+        const bgDiv = document.createElement("div");
+        bgDiv.style.position = "absolute";
+        bgDiv.style.top = "0";
+        bgDiv.style.left = "0";
+        bgDiv.style.width = "100%";
+        bgDiv.style.height = "100%";
+        bgDiv.style.backgroundImage = "url('https://64.media.tumblr.com/2960c5b1c0a4083c0d6f2ce8d3421586/tumblr_nam48mpqlc1rk0k2jo1_500.gif')";
+        bgDiv.style.backgroundSize = "cover";
+        bgDiv.style.backgroundPosition = "center";
+        bgDiv.style.backgroundRepeat = "no-repeat";
+        bgDiv.style.filter = "invert(1)";
+
+
+        // Reduce only the background’s opacity
+        bgDiv.style.opacity = "0.9"; // 60% transparent
+
+        // Make sure text stays on top
+        //loadingDiv.appendChild(bgDiv); 
+
+
+        // time out loading screen
+        function fadeOut(div, duration = 100) {
+            let opacity = 1;
+            const interval = 50;
+            const decrement = interval / duration;
+
+            const fade = setInterval(() => {
+                opacity -= decrement;
+                div.style.opacity = opacity;
+                if (opacity <= 0) {
+                    clearInterval(fade);
+                    div.style.display = "none";
+                }
+            }, interval);
+        }
+
+        // fade out after 1 second
+        setTimeout(() => {
+            fadeOut(loadingDiv, 2000); // fade over 2 second
+        }, 1000);
+
+
+
+
         // Create results div 
         const coorsDiv = document.createElement("div");
         coorsDiv.id = "coordinate-results";
@@ -223,6 +341,7 @@
         // styling 
         coorsDiv.style.zIndex = "100";        // make sure it's above the map
         coorsDiv.style.position = "fixed";  // stays on screen even on scroll
+        coorsDiv.style.textAlign = "center"; // aligns coordinates in the middle 
         coorsDiv.style.top = "50%";
         coorsDiv.style.left = "50%";
         coorsDiv.style.transform = "translate(-50%, -50%)"; // center exactly
@@ -239,9 +358,8 @@
         coorsImg.style.height = "auto";
         coorsImg.style.display = "block";
         coorsImg.style.position = "relative";
-        coorsImg.style.borderRadius = "8px"; g
+        coorsImg.style.borderRadius = "8px";
         coorsDiv.appendChild(coorsImg);
-
 
         // close button
         const close = document.createElement("button");
@@ -252,12 +370,12 @@
         close.style.width = "6%";
         close.style.height = "7%";
         close.style.padding = "0";
-        close.style.top = "2%";             // top-left corner
+        close.style.top = "2%";  // top-left corner
         close.style.left = "2%";
         close.style.border = "none"; // remove default border
         close.style.background = "none"; // remove default button background
         close.style.cursor = "pointer";  // pointer on hover
-        close.style.position = "absolute";       // overlay
+        close.style.position = "absolute";  // overlay
 
         // Add the image inside the button
         const closeImg = document.createElement("img");
@@ -307,14 +425,14 @@
 
     </script>
 
-    <script type="importmap">
+    <!-- <script type="importmap">
   {
     "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/"
     }
   }
-</script>
+</script> -->
 
     <script type="module" src="js/locate.js" defer></script>
 

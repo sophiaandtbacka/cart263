@@ -105,7 +105,7 @@ const mapBtn = createButton(
     "assets/mpassets/map.png",
     "assets/mpassets/hovermap.png",
     "53%",
-    "gallery.html"
+    "map.html"
 );
 navDiv.appendChild(mapBtn);
 

@@ -85,13 +85,13 @@ p {
 .floatingVideo {
     position: fixed;
     top: 90px;
-    left: 1320px;
+    left: 70vw;
 
     width: 600px;
     height: auto;
 
     transform: translateX(-50%);
-    z-index: 9999;
+    z-index: 99;
     pointer-events: none;
 }
 
@@ -104,13 +104,13 @@ p {
 .navl {
     position: fixed;
     top: 659px;
-    left: 1320px;
+    left: 70vw;
 
     width: 46px;
     height: auto;
 
     transform: translateX(-50%);
-    z-index: 9999;
+    z-index: 99;
 }
 
 .navl img,
@@ -125,5 +125,6 @@ p {
 
 .navimg {
     position: relative;
-    z-index: 999999;
+    z-index: 99;
+
 }

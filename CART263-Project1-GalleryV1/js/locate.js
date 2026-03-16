@@ -1,207 +1,211 @@
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+
 
 window.onload = function () {
 
-    // variables, default values 
+    // variables
     let lat = 45.5017;
     let long = -73.5673;
     let boundingBoxThreshold = 0.1;
-    let zoomDist = 2;
-
-    // styling
     let markerColor = "#0800ffff";
     let selectedMarkerColour = "cornflowerblue";
+    let roadsCol = '#68A';
 
-    // Pin data storage
+    // pin data
     let pins = [];
     let gmapCoors = [];
-    let favs = []; // link to favourite places, add them by their nums identifier (make sure to copy the info, nums identifiers change every reload)
-    let num = 0; // to count position
+    let num = 0;
+    let gmapLink = "";
 
-    // Get button element
-    const locate = document.getElementById("locate");
-
-    // Establish div location + declare loading 
+    // DOM elements
     const resultsDiv = document.getElementById("coordinate-results");
-    resultsDiv.style.visibility = "hidden"; // immediately hide 
-    let close = document.createElement("button");
-    close.textContent = "x";
-    resultsDiv.appendChild(close);
-    let name = document.createElement("h1");
-    resultsDiv.appendChild(name);
-    let info = document.createElement("p");
-    resultsDiv.appendChild(info);
+    resultsDiv.style.visibility = "hidden";
+    const googleMap = document.getElementById("gmap-btn");
+    const errorPopup = document.getElementById("error-popup")
+
+
+
+    // append h1 and p to resultsDiv
+    let nameEl = document.createElement("h1");
+    resultsDiv.appendChild(nameEl);
+    let infoEl = document.createElement("p");
+    resultsDiv.appendChild(infoEl);
+
+    // 3D model vars
+    let scene, camera, renderer, model;
 
     getPlaces();
 
-    /* Create Map */
+    // MAP SETUP
     mapboxgl.accessToken = 'pk.eyJ1IjoiYWJoaXZvbGV0aSIsImEiOiJjbW05cWV4ZTEwNXJtMnVwdjNyNmg3YmtzIn0.18DTC_mGG-07zo8XgcOgXg';
 
-    const map = new mapboxgl.Map({ //
+    const map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/light-v11',
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
         center: [long, lat],
         zoom: 15,
         pitch: 60,
         bearing: -20,
         antialias: true
-
     });
 
-
     map.on('load', () => {
+
         map.addControl(
             new mapboxgl.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true
-                },
+                positionOptions: { enableHighAccuracy: true },
                 trackUserLocation: true,
-                showUserHeading: true
-            })
+                showUserHeading: false
+            }),
+            "bottom-left"
         );
 
-        // 3D BUILDINGS
+        // search toggle
+        let searchActive = false;
+        const toggle = document.getElementById("searchToggle");
+        toggle.addEventListener("click", () => {
+            const searchBar = document.querySelector(".mapboxgl-ctrl-geocoder");
+            searchActive = !searchActive;
+            searchBar.classList.toggle("geocoder-visible", searchActive);
+        });
+
+        map.addLayer({
+            id: 'dark-overlay',
+            type: 'background',
+            paint: {
+                'background-color': '#FFF',
+                'background-opacity': 0.6
+            }
+        }, 'waterway-label');
+
+        map.setLayoutProperty('poi-label', 'visibility', 'none');
+
         map.addLayer({
             id: '3d-buildings',
             source: 'composite',
             'source-layer': 'building',
             filter: ['==', 'extrude', 'true'],
             type: 'fill-extrusion',
-
-            minzoom: 6,
+            minzoom: 0,
             paint: {
-                // Highlight selected building in bright orange
                 'fill-extrusion-color': [
                     'case',
                     ['boolean', ['feature-state', 'selected'], false],
-                    '#4DA6FF',     // highlighted building 
+                    '#4DA6FF',
                     [
-                        // Normal buildings: subtle height-based shading for visibility
-                        'interpolate',
-                        ['linear'],
-                        ['get', 'height'],
-                        0, '#D0D0D0',  // shortest buildings, light gray
-                        50, '#B0B0B0', // medium buildings, medium gray
-                        100, '#909090' // tallest buildings, darker gray
+                        'interpolate', ['linear'], ['get', 'height'],
+                        0, '#525252',
+                        10, '#6b6b6b',
+                        20, '#858585',
+                        30, '#9e9e9e',
+                        40, '#b8b8b8',
+                        50, '#c2c2c2',
+                        60, '#cccccc',
+                        80, '#d6d6d6',
+                        100, '#e0e0e0',
+                        120, '#ebebeb',
+                        150, '#f5f5f5'
                     ]
-
                 ],
-                // Use building height from data
                 'fill-extrusion-height': ['get', 'height'],
-                // Base of the building
                 'fill-extrusion-base': ['get', 'min_height'],
-                // Full opacity ensures visibility on light maps
-                'fill-extrusion-opacity': 0.95
+                'fill-extrusion-opacity': 1,
+                'fill-extrusion-ambient-occlusion-intensity': 0.8
             }
         });
 
-
-        const roadLayerIds = map.getStyle().layers.filter(l => l.id.includes('road')).map(l => l.id);
-        roadLayerIds.forEach(id => map.setPaintProperty(id, 'line-color', '#B0B0B0'));
-
+        map.getStyle().layers.forEach(layer => {
+            if (layer['source-layer'] === 'road') {
+                if (map.getPaintProperty(layer.id, 'line-color') !== undefined) {
+                    map.setPaintProperty(layer.id, 'line-color', roadsCol);
+                }
+                try { map.moveLayer(layer.id); } catch (e) { }
+            }
+        });
     });
 
-
-
-    /* Get Current User Location */
-    function getLocation() {
-        if (!navigator.geolocation) {
-            alert("Geolocation not supported");
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                lat = position.coords.latitude;
-                long = position.coords.longitude;
-                console.log("Latitude", lat);
-                console.log("Longitude", long);
-
-            },
-            (err) => {
-                console.error(err);
-                alert("Location permission denied");
-            },
-            {
-                enableHighAccuracy: true, // important for precise location
-                maximumAge: 0
-            }
-        );
-    }
-
-
-    /* Get Coordinates Near You */
+    // GET PLACES
     function getPlaces() {
-
-        // Overpass query (out body -> returns array of all body data, geom -> returns array of all coordinates listed for a spot) // less accurate results -> way["disused"="yes"] (${long-boundingBoxThreshold},${lat-boundingBoxThreshold},${long+boundingBoxThreshold},${lat+boundingBoxThreshold});
         console.log("places loading...");
-
-        // gets different types of data from the api, gives location range of 2*boundingBoxThreshold  
-        /* 
-        */
 
         const query = `
         [out:json][timeout:180];
         (
-            way["building"]["abandoned"="yes"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold}); 
-            way["leisure"="skate_park"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold}); 
-            way["building"="abandoned"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold}); 
-            way["ruins"="*"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold}); 
+            // abandoned buildings
+    way["building"]["abandoned"="yes"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+    way["building"="abandoned"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+
+    // permanently closed or inaccessible
+    way["opening_hours"="closed"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+
+    // disused or ruined
+    way["disused"="*"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+    way["ruins"="*"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+
+    // abandoned shops / amenities / leisure / landuse / tourism
+    way["shop"="abandoned"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+    way["amenity"="abandoned"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+    way["leisure"="abandoned"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+    way["landuse"="disused"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+    way["tourism"="ruins"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+    way["military"="disused"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+
+    // skate parks (still active, if needed)
+    way["leisure"="skate_park"](${lat - boundingBoxThreshold},${long - boundingBoxThreshold},${lat + boundingBoxThreshold},${long + boundingBoxThreshold});
+        
             );
-        out body geom; 
+        out body geom;
         `;
 
-        // Fetch from Overpass API (if code stops returning coordinates, its because there is an issue with this)
         fetch('https://overpass-api.de/api/interpreter', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'data=' + encodeURIComponent(query)
         })
             .then(async (response) => {
-
                 if (!response.ok) {
                     const text = await response.text();
                     console.error("Overpass error:", text);
                     throw new Error("Overpass request failed");
                 }
-
                 return response.json();
             })
-            .then(data => { // take usable JSOn file, store it as the name "data",  and run this function to extract different classifications of data
-
-
-                // adds each data to a pins array, drops pin at each location 
+            .then(data => {
                 data.elements.forEach(el => {
                     if (el.type === "way" && el.bounds) {
-
-                        // Get average location for each element
                         let avgLat = (el.bounds.minlat + el.bounds.maxlat) / 2;
                         let avgLon = (el.bounds.minlon + el.bounds.maxlon) / 2;
-
-                        // Add pin info to array
                         pins.push(el);
                         dropPinAt(avgLat, avgLon, num);
                         num++;
-
-                        // Create anchor tag to link to google maps. same reference as the pin. not being used 
-                        const gmap = `https://www.google.com/maps/search/?api=1&query=${avgLat}%2C${avgLon}`;
-                        gmapCoors.push(gmap);
-
+                        gmapCoors.push(`https://www.google.com/maps/search/?api=1&query=${avgLat}%2C${avgLon}`);
                     }
                 });
-
-                // add info to console for debugging 
-                console.log("places found.");
-                console.log("pins: ", pins);
-
+                console.log("places found.", pins);
             })
-            .catch(err => console.error(err));
+            .catch(err => errorResponse(err));
     }
 
+    function errorResponse(err) {
+        console.error(err + "success :) ")
+        errorPopup.style.visibility = "visible";
 
+        errorPopup.addEventListener("click", () => {
+            errorPopup.style.visibility = "hidden";
+            setTimeout(() => {
+                reloadMap()
+            }, 10000);
 
+        });
 
+    }
+
+    function reloadMap() {
+        window.location.reload(); // reload and try again 
+    }
+    // GEOCODER
     const coordinatesGeocoder = function (query) {
         const matches = query.match(
             /^[ ]*(?:Lat: )?(-?\d+\.?\d*)[, ]+(?:Lng: )?(-?\d+\.?\d*)[ ]*$/i
@@ -211,10 +215,7 @@ window.onload = function () {
         function coordinateFeature(lng, lat) {
             return {
                 center: [lng, lat],
-                geometry: {
-                    type: 'Point',
-                    coordinates: [lng, lat]
-                },
+                geometry: { type: 'Point', coordinates: [lng, lat] },
                 place_name: 'Lat: ' + lat + ' Lng: ' + lng,
                 place_type: ['coordinate'],
                 type: 'Feature'
@@ -225,19 +226,12 @@ window.onload = function () {
         const coord2 = Number(matches[2]);
         const geocodes = [];
 
-        if (coord1 < -90 || coord1 > 90) {
-            geocodes.push(coordinateFeature(coord1, coord2));
-        }
-
-        if (coord2 < -90 || coord2 > 90) {
-            geocodes.push(coordinateFeature(coord2, coord1));
-        }
-
+        if (coord1 < -90 || coord1 > 90) geocodes.push(coordinateFeature(coord1, coord2));
+        if (coord2 < -90 || coord2 > 90) geocodes.push(coordinateFeature(coord2, coord1));
         if (geocodes.length === 0) {
             geocodes.push(coordinateFeature(coord1, coord2));
             geocodes.push(coordinateFeature(coord2, coord1));
         }
-
         return geocodes;
     };
 
@@ -246,115 +240,155 @@ window.onload = function () {
         localGeocoder: coordinatesGeocoder,
         mapboxgl: mapboxgl,
         zoom: 16,
-        placeholder: 'Search or type: lng, lat',
+        placeholder: '   ',
         reverseGeocode: true
     });
 
     map.addControl(geocoder);
 
-    // Remove the original geocoder.on('result') listener
-    // and trigger manually on button click
+    geocoder.on('result', (e) => {
+        const coords = e.result.center;
+        long = coords[0];
+        lat = coords[1];
+        console.log("Search result - Lat:", lat, "Lng:", long);
+        map.flyTo({ center: [long, lat], zoom: 15 });
+        getPlaces();
+    });
 
-
-    /* drops pin at location, logs reference for pin, adds listener for pin */
-    function dropPinAt(lat, lon, num) {
-
-        // Use  coordinatesGeocoder function to get a Feature object
+    // DROP PIN
+    function dropPinAt(lat, lon, pinIndex) {
         const features = coordinatesGeocoder(`${lat}, ${lon}`);
         if (!features || features.length === 0) return;
 
-        const feature = features[0];
-
-        // Create pin and store it in a variable
         const marker = new mapboxgl.Marker({ color: markerColor })
             .setLngLat([lon, lat])
             .addTo(map);
 
-        // WHEN PIN IS CLICKED 
+        // Capture the correct index using a closure
         marker.getElement().addEventListener("click", () => {
-
-            // highlight
             addColoredPin(lon, lat);
             highlightBuilding(lon, lat);
+            displayPinInfo(pinIndex);
 
-            displayPinInfo(num);
-            // display data 
-            console.log("Pin clicked:", pins[num].tags); // find it in array 
+            // Set gmapLink using the correct index
+            gmapLink = gmapCoors[pinIndex];
+            console.log("gmapLink set to:", gmapLink);
 
+            // 3D viewer
+            const viewer = document.getElementById("modelViewer");
+            viewer.style.display = "block";
+            if (!renderer) initModel();
 
-            // fly to pin animation 
             map.flyTo({
                 center: [lon, lat],
                 zoom: 18,
-                padding: {
-                    left: 300,   // width of sidebar
-                    right: 0,
-                    top: 0,
-                    bottom: 0
-                }
+                padding: { left: 300, right: 0, top: 0, bottom: 0 }
             });
         });
     }
+    googleMap.addEventListener("click", () => {
+        window.open(gmapLink, '_blank');
+    });
 
-
-    /* Display Pin Info */
+    // DISPLAY PIN INFO — all your original DOM styling kept exactly
     function displayPinInfo(num) {
-        // display text content
+
         resultsDiv.style.visibility = "visible";
+        document.getElementById("coordinate-results").style.display = "block";
 
-        let title = [JSON.stringify(pins[num].bounds.minlat), JSON.stringify(pins[num].bounds.minlon)]
-        let cont = JSON.stringify(pins[num].tags);
+        let title = [JSON.stringify(pins[num].bounds.minlat), JSON.stringify(pins[num].bounds.minlon)];
+        let cont = JSON.stringify(pins[num].tags) + "";
 
-        resultsDiv.querySelector("h1").textContent = title;
-        resultsDiv.querySelector("p").textContent = cont;
+        for (let i = 0; i < cont.length; i++) { // replace commas with linebreaks
+            cont = cont.replace(/,/g, "\n");
+            cont = cont.replace(/{/g, " ");
+            cont = cont.replace(/}/g, " ");
+        }
 
+        let overlayH = resultsDiv.querySelector("h1");
+        overlayH.textContent = title;
+        overlayH.style.position = "absolute";
+        overlayH.style.top = "30%";
+        overlayH.style.left = "50%";
+        overlayH.style.transform = "translate(-50%, -50%)";
+        overlayH.style.color = "#7d7b7b";
+        overlayH.style.fontSize = "100%";
+        overlayH.style.textShadow = "0.5px 1px 3px #cececeff";
+        overlayH.style.margin = "0";
+        overlayH.style.fontFamily = "IBM Plex Mono";
+        overlayH.style.fontWeight = "400";
+        overlayH.style.fontStyle = "normal";
+
+        let overlayP = resultsDiv.querySelector("p");
+        //overlayP.textContent = cont; // changed to live typing 
+        overlayP.style.position = "absolute";
+        overlayP.style.top = "50%";
+        overlayP.style.left = "50%";
+        overlayP.style.transform = "translate(-50%, -60%)";
+        overlayP.style.color = "#7d7b7b";
+        overlayP.style.fontSize = "70%";
+        overlayP.style.textShadow = "0.5px 1px 3px #cececeff";
+        overlayP.style.margin = "0";
+        overlayP.style.fontFamily = "IBM Plex Mono";
+        overlayP.style.fontWeight = "400";
+        overlayP.style.fontStyle = "normal";
+
+        typeWriter(cont, overlayP);  // makes live typing effect 
+    }
+
+    const speed = 20; // typing speed in ms
+    let i = 0;
+
+    /* Live typing text function */
+    function typeWriter(textCont, textP) {
+
+        textP.textContent = ""; // clear previous text
+        i = 0;
+
+        function type() {
+            if (i < textCont.length) {
+                textP.textContent += textCont.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+
+        type();
     }
 
 
 
-    // Keep a reference to the last marker
+    // COLORED PIN
     let lastMarker = null;
 
-    /* add a colored pin at a given coordinate and remove the old one */
     function addColoredPin(lon, lat, color = selectedMarkerColour) {
-        // Remove the previous marker if it exists
-        if (lastMarker) {
-            lastMarker.remove();
-        }
 
-        // Create a new marker
+
+        if (lastMarker) lastMarker.remove();
+
         const marker = new mapboxgl.Marker({ color: color })
             .setLngLat([lon, lat])
             .addTo(map);
 
-        // Store reference to this marker
         lastMarker = marker;
+
+        marker.getElement().addEventListener("click", () => {
+            addColoredPin(lon, lat);
+            highlightBuilding(lon, lat);
+            displayPinInfo(num);
+            document.getElementById("modelViewer").style.display = "block";
+            if (!renderer) initModel();
+        });
 
         return marker;
     }
 
-
-    /* Fly To Coors */
-    function zoomIn(lo, la) {  // note: in mapping softwares its switched long, lat is standard 
-
-        console.log("zooming");
-        map.flyTo({
-            center: [lo, la],
-            zoom: 17,
-            pitch: 0
-        });
-    }
-
-
-    /* FUNCTION HIGHLIGHTS SELECTED BUILDING */
+    // HIGHLIGHT BUILDING
     let lastHighlightedBuildingId = null;
+
     function highlightBuilding(lng, lat) {
-
         const point = map.project([lng, lat]);
-
-        const features = map.queryRenderedFeatures(point, {
-            layers: ['3d-buildings']
-        });
+        const features = map.queryRenderedFeatures(point, { layers: ['3d-buildings'] });
 
         if (!features || features.length === 0) {
             console.log("No building found at that coordinate");
@@ -362,97 +396,170 @@ window.onload = function () {
         }
 
         const building = features[0];
-
         if (!building.id) {
             console.log("Building has no ID (cannot highlight)");
             return;
         }
 
-        // Reset previous highlighted building
         if (lastHighlightedBuildingId !== null) {
             map.setFeatureState(
-                {
-                    source: 'composite',
-                    sourceLayer: 'building',
-                    id: lastHighlightedBuildingId
-                },
+                { source: 'composite', sourceLayer: 'building', id: lastHighlightedBuildingId },
                 { selected: false }
             );
         }
 
-        // Highlight new building
         map.setFeatureState(
-            {
-                source: 'composite',
-                sourceLayer: 'building',
-                id: building.id
-            },
+            { source: 'composite', sourceLayer: 'building', id: building.id },
             { selected: true }
         );
 
-        lastHighlightedBuildingId = building.id; // remember new building
-
+        lastHighlightedBuildingId = building.id;
     }
 
+    // CLOSE BUTTON
+    const close = document.getElementById("close-btn");
+    close.addEventListener("click", async () => {
 
-    geocoder.on('result', (e) => {
+        console.log("entered close button")
 
-        const coords = e.result.center; // [lng, lat]
+        resultsDiv.style.visibility = "hidden";
 
-        long = coords[0];
-        lat = coords[1];
+        // stop 3D viewer
+        document.getElementById("modelViewer").style.display = "none";
 
-        console.log("Search result:");
-        console.log("Latitude:", lat);
-        console.log("Longitude:", long);
+    });
 
-        // Move map to new location
-        map.flyTo({
-            center: [long, lat],
-            zoom: 15
+
+    document.addEventListener("submit", (e) => e.preventDefault());
+
+    // 3D MODEL — single clean initModel using imported GLTFLoader
+
+    function initModel() {
+        console.log("Initializing 3D viewer");
+
+        const container = document.getElementById("modelViewer");
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 6;
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setClearColor(0x000000, 0);
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const light = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
+        scene.add(light);
+
+        let particles = null;
+        let particleVelocities = [];
+        let exploding = false;
+
+        // Click to explode
+        renderer.domElement.addEventListener("click", () => {
+            if (model && !exploding) explodeModel();
         });
 
-        // Reset previous data
-        pins = [];
-        gmapCoors = [];
-        num = 0;
+        function explodeModel() {
+            exploding = true;
 
-        // Call getPlaces with the new lat/lon coordinates 
-        getPlaces();
-    });
+            // Sample positions from the model's geometry
+            const positions = [];
+            model.traverse((child) => {
+                if (child.isMesh) {
+                    const geo = child.geometry.clone();
+                    geo.applyMatrix4(child.matrixWorld);
+                    const pos = geo.attributes.position;
+                    for (let i = 0; i < pos.count; i++) {
+                        positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+                    }
+                }
+            });
 
-    /* Currently not doing anything */
-    locate.addEventListener("click", async () => {
+            // Subsample so you don't get 100k particles
+            const maxParticles = 3000;
+            const step = Math.max(1, Math.floor(positions.length / 3 / maxParticles));
+            const sampledPos = [];
+            for (let i = 0; i < positions.length / 3; i += step) {
+                sampledPos.push(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
+            }
 
-        if (locate.disabled) return;
-        locate.disabled = true;
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(sampledPos, 3));
 
-        console.log("location");
+            const mat = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.05,
+                transparent: true,
+                opacity: 1.0,
+                depthWrite: false
+            });
 
-        try {
-            // getLocation();   
-            //getPlaces();   
+            particles = new THREE.Points(geo, mat);
+            scene.add(particles);
+            scene.remove(model);
 
-
-        } catch (e) {
-            console.log("Location failed.");
-            button.disabled = false;  // re-enable button if location fails
+            // Give each particle a random outward velocity
+            for (let i = 0; i < sampledPos.length / 6; i++) {
+                particleVelocities.push(
+                    (Math.random() - 0.5) * 0.08,
+                    (Math.random() - 0.5) * 0.08,
+                    (Math.random() - 0.5) * 0.08
+                );
+            }
         }
 
-        // Move map
-        // zoomIn(lat, long); 
+        function updateParticles() {
+            if (!particles || !exploding) return;
 
+            const pos = particles.geometry.attributes.position.array;
+            for (let i = 0; i < pos.length / 3; i++) {
+                pos[i * 3] += particleVelocities[i * 3];
+                pos[i * 3 + 1] += particleVelocities[i * 3 + 1];
+                pos[i * 3 + 2] += particleVelocities[i * 3 + 2];
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
 
-    });
+            // Fade out
+            particles.material.opacity -= 0.008;
+            if (particles.material.opacity <= 0) {
+                scene.remove(particles);
+                particles = null;
+                exploding = false;
+                // Respawn model
+                model.rotation.y = 0;
+                scene.add(model);
+            }
+        }
 
-    document.addEventListener("submit", (e) => {
-        e.preventDefault();
-    });
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 
-    // close the info div button 
-    close.addEventListener("click", async () => {
-        resultsDiv.style.visibility = "hidden";
-    })
+        const loader = new GLTFLoader();
+        loader.setDRACOLoader(dracoLoader);
 
+        loader.load(
+            "assets/dnumbc.glb",
+            function (gltf) {
+                console.log("MODEL SUCCESSFULLY LOADED");
+                model = gltf.scene;
+                model.scale.set(0.077, 0.1, 0.1);
+                model.position.y = -1;
+                scene.add(model);
 
-};
+                function animate() {
+                    requestAnimationFrame(animate);
+                    if (!exploding) model.rotation.y += 0.025;
+                    updateParticles();
+                    renderer.render(scene, camera);
+                }
+                animate();
+            },
+            (progress) => {
+                if (progress.total) console.log("Loading:", Math.round((progress.loaded / progress.total) * 100) + "%");
+            },
+            (error) => console.error("MODEL FAILED TO LOAD", error)
+        );
+    }
+
+}

@@ -197,20 +197,6 @@ function animate() {
 
     renderer.render(scene, camera);
 }
-// const video = document.createElement("video");
-// // video.src = "assets/images/hughe.mp4";
-// video.loop = true;
-// video.muted = true;
-// video.play();
-
-// const texture = new THREE.VideoTexture(video);
-
-// const geometry = new THREE.PlaneGeometry(2,1);
-// const material = new THREE.MeshBasicMaterial({ map: texture });
-
-// const mesh = new THREE.Mesh(geometry, material);
-// scene.add(mesh);
-
 
 initializeBlocks();
 animate();
