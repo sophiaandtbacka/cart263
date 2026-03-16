@@ -78,7 +78,7 @@ class galleryStarFrame {
         */
 
 
-        // create a tag links, can't reuse a tag this way, in future will create a function to do this and reduce redundancies
+        // create a tag links, can't reuse a tag with my current structure, in future will create a function to do this and reduce redundancies
         const linkKat1 = document.createElement("a");
         linkKat1.href = "https://www.instagram.com/how.2disintegrate/";
 
@@ -141,7 +141,7 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat1.appendChild(img1);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat1);
 
 
@@ -157,7 +157,7 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat2.appendChild(img2);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat2);
 
 
@@ -173,7 +173,7 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie1.appendChild(img3);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie1);
 
 
@@ -189,7 +189,7 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie2.appendChild(img4);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie2);
 
 
@@ -205,10 +205,11 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie3.appendChild(img5);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie3);
 
-        //img6 in grid, kat
+
+        //img6 in grid, kat 2
         const img6 = document.createElement("img");
         img6.src = "./media/background_imgs/kat2.png";
 
@@ -220,10 +221,10 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat3.appendChild(img6);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat3);
 
-        //img7 in grid, kat
+        //img7 in grid, kat 2.2
         const img7 = document.createElement("img");
         img7.src = "./media/background_imgs/kat2.2.png";
 
@@ -236,7 +237,7 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat4.appendChild(img7);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat4);
 
 
@@ -252,11 +253,11 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie4.appendChild(img8);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie4);
 
 
-        //img9 in grid, kat
+        //img9 in grid, kat 3
         const img9 = document.createElement("img");
         img9.src = "./media/background_imgs/kat3.png";
 
@@ -268,10 +269,11 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat5.appendChild(img9);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat5);
 
-        //img10 in grid, kat
+
+        //img10 in grid, kat 3.2
         const img10 = document.createElement("img");
         img10.src = "./media/background_imgs/kat3.2.png";
 
@@ -283,8 +285,9 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat6.appendChild(img10);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat6);
+
 
         //img11 in grid, sophie 5
         const img11 = document.createElement("img");
@@ -298,7 +301,7 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie5.appendChild(img11);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie5);
 
 
@@ -314,11 +317,11 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie6.appendChild(img12);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie6);
 
 
-        //img 13 in grid, kat
+        //img 13 in grid, kat 4
         const img13 = document.createElement("img");
         img13.src = "./media/background_imgs/kat4.png";
 
@@ -330,11 +333,11 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat7.appendChild(img13);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat7);
 
 
-        //img 14 in grid, kat
+        //img 14 in grid, kat 4.2
         const img14 = document.createElement("img");
         img14.src = "./media/background_imgs/kat4.2.png";
 
@@ -346,11 +349,11 @@ class galleryStarFrame {
 
         // append img inside the link
         linkKat8.appendChild(img14);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkKat8);
 
 
-        //img 15 in grid, sophie
+        //img 15 in grid, sophie 6
         const img15 = document.createElement("img");
         img15.src = "./media/background_imgs/sophie6.png";
 
@@ -362,11 +365,11 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie7.appendChild(img15);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie7);
 
 
-        //img 16 in grid, sophie
+        //img 16 in grid, sophie 8
         const img16 = document.createElement("img");
         img16.src = "./media/background_imgs/sophie8.png";
 
@@ -378,7 +381,7 @@ class galleryStarFrame {
 
         // append img inside the link
         linkSophie8.appendChild(img16);
-        // append the link to your grid
+        // append the link to grid
         this.imageGrid.appendChild(linkSophie8);
 
 
