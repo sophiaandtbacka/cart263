@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spray</title>
+    <title>About</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Jersey+10&display=swap"
@@ -169,9 +169,9 @@
 
             `but so many spaces are restricted by commercialization under capitalism. Forced to spend if we want to explore, we are recluded into our boxes – bound by the walls of our rooms and our phone screens. Innately we yearn for nature as our ancestors had for millions of years before us, but we are the first generation to subsist for entire seasons in concrete jungles, never seeing natural forms, separated from the earth. Our mission is to bring back free adventure.`,
 
-            `<strong>Third spaces are dying.</strong> The youth are left with a post-covid era, no shopping malls or common spaces to congregate. <strong>Space3</strong> is designed to offer an alternative to bring back third spaces, satiate our urge for adventure in this <strong>dystopian concrete hellscape</strong>.`,
+            `<strong>Third spaces are dying!!!</strong> The youth are left with a post-covid era, no shopping malls or common spaces to congregate. <strong>Space3</strong> is designed to offer an alternative to bring back third spaces, satiate our urge for adventure in this <strong>dystopian concrete hellscape</strong>.`,
 
-            `But these spaces are more than forgotten infrastructure <strong>they are accidental galleries.</strong> Walk through an abandoned factory and you are walking through layers of time. The architecture alone tells a story; the era it belonged to, the moment it was left behind. Peeling paint, collapsed ceilings, light breaking through shattered windows <strong>decay</strong> has a visual language of its own, and it is <strong>devastatingly beautiful.</strong>`,
+            `These spaces are more than forgotten infrastructure <strong>they are accidental galleries.</strong> Walk through an abandoned factory and you are walking through layers of time. The architecture alone tells a story; the era it belonged to, the moment it was left behind. Peeling paint, collapsed ceilings, light breaking through shattered windows <strong>decay</strong> has a visual language of its own, and it is <strong>devastatingly beautiful.</strong>`,
 
             `Abandoned spaces are a symptom of late-stage capitalism, poor management of resources all in the name of quick profit. Neglected for years, even decades, decommissioned structures are everywhere. <strong>Space3 puts capitalist wastelands on a map - a gateway to a gatekept community.</strong>`
         ];
@@ -303,27 +303,55 @@
         }
 
         function sprayPaint(x, y) {
-            for (let i = 0; i < 60; i++) {
+            // Dense core — many tiny particles tightly clustered
+            for (let i = 0; i < 180; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const radius = SPRAY_SIZE * Math.pow(Math.random(), 0.6);
-                const alpha = (1 - radius / SPRAY_SIZE) * 0.28 + Math.random() * 0.12;
+                const radius = SPRAY_SIZE * Math.pow(Math.random(), 1.8); // heavy center bias
+                const alpha = (1 - radius / SPRAY_SIZE) * 0.45 + Math.random() * 0.15;
+                const dotSize = Math.random() * 1.2 + 0.2;
                 ctx.beginPath();
-                ctx.arc(x + radius * Math.cos(angle), y + radius * Math.sin(angle), Math.random() * 1.8 + 0.3, 0, Math.PI * 2);
+                ctx.arc(
+                    x + radius * Math.cos(angle),
+                    y + radius * Math.sin(angle),
+                    dotSize, 0, Math.PI * 2
+                );
                 ctx.fillStyle = hexToRgba(SPRAY_COLOR, alpha);
                 ctx.fill();
             }
-            const grad = ctx.createRadialGradient(x, y, 0, x, y, SPRAY_SIZE * 0.9);
-            grad.addColorStop(0, hexToRgba(SPRAY_COLOR, 0.13));
+
+            // Soft wet-paint core bleed
+            const grad = ctx.createRadialGradient(x, y, 0, x, y, SPRAY_SIZE * 0.55);
+            grad.addColorStop(0, hexToRgba(SPRAY_COLOR, 0.38));
+            grad.addColorStop(0.4, hexToRgba(SPRAY_COLOR, 0.18));
             grad.addColorStop(1, hexToRgba(SPRAY_COLOR, 0));
             ctx.beginPath();
-            ctx.arc(x, y, SPRAY_SIZE * 0.6, 0, Math.PI * 2);
+            ctx.arc(x, y, SPRAY_SIZE * 0.55, 0, Math.PI * 2);
             ctx.fillStyle = grad;
             ctx.fill();
-        }
 
+            // Sparse outer mist — realistic overspray
+            for (let i = 0; i < 30; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = SPRAY_SIZE * (0.7 + Math.random() * 0.5);
+                const alpha = Math.random() * 0.08;
+                ctx.beginPath();
+                ctx.arc(
+                    x + radius * Math.cos(angle),
+                    y + radius * Math.sin(angle),
+                    Math.random() * 0.8 + 0.1, 0, Math.PI * 2
+                );
+                ctx.fillStyle = hexToRgba(SPRAY_COLOR, alpha);
+                ctx.fill();
+            }
+        }
         function toCanvasPos(clientX, clientY) {
             const rect = sprayCanvas.getBoundingClientRect();
-            return { x: clientX - rect.left, y: clientY - rect.top };
+            // Offset upward to match the nozzle tip at the top of the can overlay
+            const nozzleOffsetY = -(220 * 0.72); // ~158px upward
+            return {
+                x: clientX - rect.left,
+                y: (clientY + nozzleOffsetY) - rect.top
+            };
         }
 
         let spraying = false;
@@ -357,7 +385,7 @@
             requestAnimationFrame(animate);
             if (canGroup) {
                 targetTilt = mouseDown ? -0.55 : -0.35;
-                currentTilt += (targetTilt - currentTilt) * 0.12;
+                currentTilt += (targetTilt - currentTilt) * 0.19;
                 canGroup.rotation.z = currentTilt;
                 canGroup.rotation.y = Math.sin(Date.now() * 0.0008) * 0.08;
             }
