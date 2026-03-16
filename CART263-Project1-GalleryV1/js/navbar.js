@@ -84,22 +84,30 @@ const aboutBtn = createButton(
     "about-btn",
     "assets/mpassets/about.png",
     "assets/mpassets/hoverabout.png",
-    "60%",
+    "44%",
     "about.html"
 );
 navDiv.appendChild(aboutBtn);
-
 
 // GALLERY BUTTON
 const galleryBtn = createButton(
     "gallery-btn",
     "assets/mpassets/gallery.png",
     "assets/mpassets/hovergallery.png",
-    "80%",
+    "36%",
     "gallery.html"
 );
 navDiv.appendChild(galleryBtn);
 
+// MAP BUTTON
+const mapBtn = createButton(
+    "map-btn",
+    "assets/mpassets/map.png",
+    "assets/mpassets/hovermap.png",
+    "53%",
+    "gallery.html"
+);
+navDiv.appendChild(mapBtn);
 
 
 /* ---------------------------------------------------
@@ -107,7 +115,7 @@ navDiv.appendChild(galleryBtn);
    
    doesn't work rn
 --------------------------------------------------- */
-
+/*
 window.hideNavbar = function () {
     navDiv.style.opacity = "0";
     navDiv.style.pointerEvents = "none";
@@ -117,3 +125,4 @@ window.showNavbar = function () {
     navDiv.style.opacity = "1";
     navDiv.style.pointerEvents = "auto";
 };
+*/

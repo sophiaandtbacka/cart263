@@ -26,7 +26,7 @@ window.onload = function () {
     function renderGalleryStarFrame() {
         // renders all stars, set num of stars at top in gallery
         let starFrame = gallery.galleryStarFrame[0];//0 because only one star frame is created
-        starFrame.renderGalleryStars();
+        starFrame.renderGalleryStarFrames();
     }
 
     //calls all functions for Gallery Star Frame
