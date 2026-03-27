@@ -41,8 +41,6 @@ class FreeStyleObj {
 
         let v = this.avgVolume;
 
-
-
         let r = Math.min(255, v * 25);
         let g = Math.min(255, v * 5);
         let b = Math.min(255, v * 80);
