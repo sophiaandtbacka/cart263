@@ -41,6 +41,7 @@ function go_all_stuff() {
     drawingBoardC.addObj(new FreeStyleObj(10, 100, 300, "#CF9FFF", "#CF9FFF", drawingBoardC.context))
     drawingBoardC.display();
 
+
     let drawingBoardD = new DrawingBoard(theCanvases[3], theContexts[3], theCanvases[3].id);
     drawingBoardD.addObj(new VideoObj(0, 0, 400, 300, videoEl, drawingBoardD.context))
     drawingBoardD.display();
@@ -53,6 +54,7 @@ function go_all_stuff() {
         /*** CALL THE EACH CANVAS TO ANIMATE INSIDE  */
         drawingBoardA.animate();
         drawingBoardB.animate();
+        //getMicrophoneInput();
         drawingBoardC.animate();
         drawingBoardD.run(videoEl)
         window.requestAnimationFrame(animationLoop);
@@ -122,6 +124,8 @@ function go_all_stuff() {
      *  
      */
 
+
+
     /** TASK 4:(Video - recorded - )
      * // add filters or manipulate the pixels... take user input from the boxes..
      *  1: using thr provided VideoObj class - > 
@@ -137,8 +141,5 @@ function go_all_stuff() {
      * PLEASE NOTE: there will be marks taken off if you ignore the instructions ;)
      *  
      */
-
-
-
 
 }
