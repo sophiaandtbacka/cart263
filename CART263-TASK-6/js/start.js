@@ -1,3 +1,4 @@
+
 window.onload = go_all_stuff;
 
 function go_all_stuff() {
@@ -119,7 +120,8 @@ function go_all_stuff() {
     /** TASK 3:(Drawing Board C) - 
      *  1: Affect the free-style shape by input from the microphone somehow, in real time...
      *  at least two properties of the free-style shape need to update and change...
-     *  2: apply some arbitrary animation to the free-style shape (change the properties in the update method provided)
+ 
+    *  2: apply some arbitrary animation to the free-style shape (change the properties in the update method provided)
      * -> the code for the microphone has NOT been added  - you need to implement it correctly...
      *  
      */

@@ -21,7 +21,7 @@ class VideoObj {
         filterButton_blur.addEventListener("click", function () {
             //get value from input field
             self.userProvidedBlur = blurInput.value;
-            console.log(self.userProvidedBlur);
+            //console.log(self.userProvidedBlur);
 
         });
 
@@ -32,7 +32,7 @@ class VideoObj {
 
         filterButton_sepia.addEventListener("click", function () {
             self.userProvidedSepia = sepiaInput.value;
-            console.log(self.userProvidedSepia);
+            //console.log(self.userProvidedSepia);
         });
 
 
@@ -42,7 +42,7 @@ class VideoObj {
 
         filterButton_hue.addEventListener("click", function () {
             self.userProvidedHue = hueInput.value;
-            console.log(self.userProvidedHue);
+            //console.log(self.userProvidedHue);
         });
 
 
@@ -52,7 +52,7 @@ class VideoObj {
 
         filterButton_invert.addEventListener("click", function () {
             self.userProvidedInvert = invertInput.value;
-            console.log(self.userProvidedInvert);
+            //console.log(self.userProvidedInvert);
         });
 
     }
@@ -75,6 +75,7 @@ class VideoObj {
         this.context.fillRect(this.shapeX, this.shapeY, 50, 50)
 
         this.context.restore();
+
     }
 
     //called when rectangle color is to be updated
