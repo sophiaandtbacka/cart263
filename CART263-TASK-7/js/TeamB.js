@@ -18,28 +18,41 @@ export class PlanetB {
         //TODO: Use castShadow and receiveShadow on the mesh and all future ones so they can cast and receive shadows.
         //TODO: Add the planet mesh to the planet group.
 
-        //create planet mesh
-        const geometryPlanetB = new THREE.SphereGeometry(1.7, 64, 64);//give planet radius, width segments (64 is max), height segments (64 is max), width and height makes it as round as can be
+        //create planet B, red and blue metal planet
+        const geometryPlanetB = new THREE.SphereGeometry(1.5, 64, 64);//give planet radius, width segments (64 is max), height segments (64 is max), width and height makes it as round as can be
         const materialPlanetB = new THREE.MeshStandardMaterial({
             color: 0x3d88b3,//0x makes it a hex decimal instead of rgb
             emissive: 0x852929,
-            emissiveIntensity: 1.0,//default 1
-            flatShading: true,
-            metalness: 1.0,
-            roughness: 0,
+            emissiveIntensity: .5,//default 1
+            flatShading: false,
+            metalness: .9,
+            roughness: .7,
         });//color of planet, emissive color it emits, flat shading shaded the facets of the sphere, metalness max 1 (looks most metalic), roughness 0 makes super shiny
         const planetB = new THREE.Mesh(geometryPlanetB, materialPlanetB);
-
-        scene.add(planetB);
 
         //creating shadows
         planetB.castShadow = true //sphere is making a shadow
         planetB.receiveShadow = true //sphere can receive shadow
 
-        //adding to planet group
+        //add to planetB to planet group
         this.group.add(planetB);
 
 
+        //create glow effect
+        const glowGeometryB = new THREE.SphereGeometry(2, 10, 12);//creates weird red blob around planet, rad can't be bigger than 2 according to prompt
+        const glowMaterialB = new THREE.MeshBasicMaterial({
+            color: 0x852929,//same color as emissive
+            transparent: true,
+            opacity: 0.35,
+            flatShading: true,
+        });
+        const planetBglow = new THREE.Mesh(glowGeometryB, glowMaterialB);
+
+        //no shadow on glow effect
+        planetBglow.castShadow = false;
+
+        //add glow to planet group
+        this.group.add(planetBglow);
 
 
         //STEP 2: 
@@ -84,7 +97,7 @@ export class PlanetB {
         //TODO: Use raycasting in the click() method below to detect clicks on the models, and make an animation happen when a model is clicked.
         //TODO: Use your imagination and creativity!
 
-        //this.scene.add(this.group);
+        this.scene.add(this.group);
     }
 
     update(delta) {
