@@ -44,7 +44,6 @@ export class PlanetB {
             color: 0x852929,//same color as emissive
             transparent: true,
             opacity: 0.35,
-            flatShading: true,
         });
         const planetBglow = new THREE.Mesh(glowGeometryB, glowMaterialB);
 
@@ -59,28 +58,74 @@ export class PlanetB {
         //TODO: Add from 1 to 3 orbiting moons to the planet group.
         //TODO: The moons should rotate around the planet just like the planet group rotates around the Sun.
 
-        // const moonNum = 2;
-        // this.moons = [];
-        // this.moonGroup = new THREE.Group();
+        //  // Add corona (particle ring)
+        //         const coronaParticles = new THREE.BufferGeometry();
+        //         const coronaCount = 200;
+        //         const coronaPositions = new Float32Array(coronaCount * 3);
+        //         for (let i = 0; i < coronaCount; i++) {
+        //             const angle = (i / coronaCount) * Math.PI * 2;
+        //             const radius = 3.8 + Math.random() * 0.5;
+        //             coronaPositions[i * 3] = Math.cos(angle) * radius;
+        //             coronaPositions[i * 3 + 1] = (Math.random() - 0.5) * 0.5;
+        //             coronaPositions[i * 3 + 2] = Math.sin(angle) * radius;
+        //         }
+        //         coronaParticles.setAttribute('position', new THREE.BufferAttribute(coronaPositions, 3));
+        //         const coronaMaterial = new THREE.PointsMaterial({ color: 0xffaa33, size: 0.1 });
+        //         this.corona = new THREE.Points(coronaParticles, coronaMaterial);
+        //         this.corona.castShadow = false;
+        //         this.scene.add(this.corona);
+
+        const moonNum = 3//Math.random() * (3 - 2) + 2; //create random num of moons
+        this.moons = []; //creates array to store moons
 
 
-        // //createMoon(moon) {
+        //creates moons
+        for (let i = 0; i < moonNum; i++) {
 
-        //     const geometryMoon = new THREE.SphereGeometry(2, 2, 2);
-        //     geometryMoon.radius(Math.random(1.5, 2));//give planet radius
-        //     const materialMoon = new THREE.MeshStandardMaterial({ color: (200, 50, 50) });//look at mat prop and make more interesting
-        //     const moon = new THREE.Mesh(geometryMoon, materialMoon);
+            const moonGroup = new THREE.Group();//make universal variable for moon group so can access in update
 
-        //     this.moon.push(moons);
-        //     moonGroup.add(moon);
+            const geometryMoon = new THREE.SphereGeometry(Math.random() * (0.7 - 0.4) + 0.4, 32, 32);//made rad between 0.4 and 0.7
+            const materialMoon = new THREE.MeshStandardMaterial({
+                color: 0x3d88b3,
+                emissive: 0x852929,
+                emissiveIntensity: .5,//default 1
+                flatShading: false,
+                metalness: .9,
+                roughness: .7,
+            });//look at mat prop and make more interesting
+            const moon = new THREE.Mesh(geometryMoon, materialMoon);
 
-        // };
+            //shadows, moons can creatd and receive shadows
+            moon.castShadow = true;
+            moon.receiveShadow = true;
+
+            //offsets moons on different orbitting rings
+            const orbitRad = 3 + i * 1.5
+            moon.position.x = orbitRad;
+
+            //random start angle, do moon group because rotation relative to planet B
+            moonGroup.rotation.y = Math.random() * Math.PI * 2
 
 
-        // for (let i = 0; i < moonNum; i++) {
-        //     createMoon();
+            //add moon to moon group
+            moonGroup.add(moon);
+
+            this.moons.push({ group: moonGroup, speed: 0.2 + Math.random() * 0.8 });
+
+            //add whole moongroup to planet group
+            this.group.add(moonGroup);
+        };
+
+
+
+        //         moonOrbitRadius = orbitRadius;
+        //         moonOrbitSpeed = orbitSpeed;
+        //         this.angle = Math.random() * Math.PI * 2;
+
+
         // }
-
+        // createMoons(moon,10,0.5);
+        // this.group.add(moons[i]);
 
 
         // //idk if need this
@@ -109,8 +154,12 @@ export class PlanetB {
         // Rotate planet
         this.group.rotation.y += delta * 0.5;
 
+
         //TODO: Do the moon orbits and the model animations here.
-        // this.moonGroup.rotation.y += delta * 0.5;
+
+        this.moons.forEach(moon => {
+            moon.group.rotation.y += delta * moon.speed;
+        });
     }
 
     click(mouse, scene, camera) {
