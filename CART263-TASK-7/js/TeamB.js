@@ -21,8 +21,8 @@ export class PlanetB {
         //create planet B, red and blue metal planet
         const geometryPlanetB = new THREE.SphereGeometry(1.5, 64, 64);//give planet radius, width segments (64 is max), height segments (64 is max), width and height makes it as round as can be
         const materialPlanetB = new THREE.MeshStandardMaterial({
-            color: 0x3d88b3,//0x makes it a hex decimal instead of rgb
-            emissive: 0x852929,
+            color: 0x3d88b3,//0x makes it a hex decimal instead of rgb, blue rn
+            emissive: 0x852929,//red rn
             emissiveIntensity: .5,//default 1
             flatShading: false,
             metalness: .9,
@@ -58,79 +58,54 @@ export class PlanetB {
         //TODO: Add from 1 to 3 orbiting moons to the planet group.
         //TODO: The moons should rotate around the planet just like the planet group rotates around the Sun.
 
-        //  // Add corona (particle ring)
-        //         const coronaParticles = new THREE.BufferGeometry();
-        //         const coronaCount = 200;
-        //         const coronaPositions = new Float32Array(coronaCount * 3);
-        //         for (let i = 0; i < coronaCount; i++) {
-        //             const angle = (i / coronaCount) * Math.PI * 2;
-        //             const radius = 3.8 + Math.random() * 0.5;
-        //             coronaPositions[i * 3] = Math.cos(angle) * radius;
-        //             coronaPositions[i * 3 + 1] = (Math.random() - 0.5) * 0.5;
-        //             coronaPositions[i * 3 + 2] = Math.sin(angle) * radius;
-        //         }
-        //         coronaParticles.setAttribute('position', new THREE.BufferAttribute(coronaPositions, 3));
-        //         const coronaMaterial = new THREE.PointsMaterial({ color: 0xffaa33, size: 0.1 });
-        //         this.corona = new THREE.Points(coronaParticles, coronaMaterial);
-        //         this.corona.castShadow = false;
-        //         this.scene.add(this.corona);
 
-        const moonNum = 3//Math.random() * (3 - 2) + 2; //create random num of moons
-        this.moons = []; //creates array to store moons
+        const moonNum = Math.random() * (3 - 1) + 1; //create random num of moons between 1 and 3
+        this.moons = []; //creates array to store moons, this. makes universally accessible, accessed in update
 
 
         //creates moons
         for (let i = 0; i < moonNum; i++) {
 
-            const moonGroup = new THREE.Group();//make universal variable for moon group so can access in update
+            const moonRotation = new THREE.Group();//make group for all moons for planet B
 
-            const geometryMoon = new THREE.SphereGeometry(Math.random() * (0.7 - 0.4) + 0.4, 32, 32);//made rad between 0.4 and 0.7
+
+            //create moon
+            const geometryMoon = new THREE.SphereGeometry(Math.random() * (0.7 - 0.4) + 0.4, 32, 32);//made rad between 0.4 and 0.7, 32 because it's small we don't need the detail of 64 segments
             const materialMoon = new THREE.MeshStandardMaterial({
-                color: 0x3d88b3,
-                emissive: 0x852929,
+                color: 0x852929,
+                emissive: 0x3d88b3,
                 emissiveIntensity: .5,//default 1
                 flatShading: false,
                 metalness: .9,
                 roughness: .7,
-            });//look at mat prop and make more interesting
+            });
             const moon = new THREE.Mesh(geometryMoon, materialMoon);
 
-            //shadows, moons can creatd and receive shadows
+
+            //shadows, moons can create and receive shadows
             moon.castShadow = true;
             moon.receiveShadow = true;
 
-            //offsets moons on different orbitting rings
+
+            //offsets moons on different orbitting rings, offeset based on index
             const orbitRad = 3 + i * 1.5
             moon.position.x = orbitRad;
 
-            //random start angle, do moon group because rotation relative to planet B
-            moonGroup.rotation.y = Math.random() * Math.PI * 2
+            //random start angle, do moon rotation group because rotation relative to planet B is easier than having each moon moving independently, rotation around planet B works because moon group is in the planet group so planet B becomes center of rotation
+            moonRotation.rotation.y = Math.random() * Math.PI * 2
 
 
-            //add moon to moon group
-            moonGroup.add(moon);
+            //add moon to moon rotation group, need this for different start angles
+            moonRotation.add(moon);
 
-            this.moons.push({ group: moonGroup, speed: 0.2 + Math.random() * 0.8 });
+            //add moon to moons array, three moonGroup are created idk this logic is a bit questionable but it works 
+            this.moons.push({ group: moonRotation, speed: Math.random() * (1 - 0.5) + 0.5 }); //speed in between 0.5 and 1
 
-            //add whole moongroup to planet group
-            this.group.add(moonGroup);
+            //three moon rotation to planet group
+            this.group.add(moonRotation);
+
+            console.log(moonRotation);
         };
-
-
-
-        //         moonOrbitRadius = orbitRadius;
-        //         moonOrbitSpeed = orbitSpeed;
-        //         this.angle = Math.random() * Math.PI * 2;
-
-
-        // }
-        // createMoons(moon,10,0.5);
-        // this.group.add(moons[i]);
-
-
-        // //idk if need this
-        // this.moonGroup.castShadow = true //sphere is making a shadow
-        // this.moonGroup.receiveShadow = true //sphere can receive shadow
 
 
 
@@ -157,6 +132,7 @@ export class PlanetB {
 
         //TODO: Do the moon orbits and the model animations here.
 
+        //Moons Orbiting PlanetB
         this.moons.forEach(moon => {
             moon.group.rotation.y += delta * moon.speed;
         });
