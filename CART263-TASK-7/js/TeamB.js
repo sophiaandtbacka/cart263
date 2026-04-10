@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+//this is abhi's
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Planet class for Team B
@@ -63,7 +64,7 @@ export class PlanetB {
         const moonNum = Math.random() * (3 - 1) + 1; //create random num of moons between 1 and 3
         this.moons = []; //creates array to store moons, this. makes universally accessible, accessed in update
 
-        //moon interaction
+        //moon interaction, this is abhi's
         this.moonJumping = false;
         this.moonJumpTime = 0;
 

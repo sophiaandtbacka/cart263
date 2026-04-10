@@ -15,7 +15,7 @@ axesHelper.position.x = -1;
 axesHelper.position.y = -1;
 
 
-//command backslash to comment out big section
+//command backslash to comment ouFt big section
 /*
 //A: the geometry
 const geometry = new THREE.BoxGeometry(1, 1, 1)//makes cube and assigns to Three
