@@ -1,4 +1,8 @@
+//import * as THREE from 'three';
+//import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/RGBELoader.js';
+
 import * as THREE from 'three';
+//import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 //using glsl which runs on gpu instead of cpu, faster for graphics because gpu is running multiple things in parallel rather than sequentially like with js and cpu
 
 //I need to set up my files differently to run this
@@ -208,11 +212,31 @@ const fragmentShader = `
 varying vec3 v_normal;
 
 void main() {
-    vec3 lightDir = normalize(vec3(2.0, 2.0, 0.0));
+    //vec3 lightDir = normalize(vec3(2.0, 2.0, 0.0));
 
-    float lightAmount = max(dot(v_normal, lightDir), 0.0);
+    //float lightAmount = max(dot(v_normal, lightDir), 0.0);
 
-    gl_FragColor = vec4(vec3(lightAmount)*1.1, 1); //1.1 is intensity of light
+    //gl_FragColor = vec4(vec3(lightAmount)*1.1, 1); //1.1 is intensity of light
+    
+    vec3 normal = normalize(v_normal);
+    
+    vec3 lightDir = normalize(vec3(2.0, 2.0, 2.0));
+    vec3 viewDir = normalize(vec3(0.0, 0.0, 1.0)); // camera direction
+
+    // Diffuse
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    // Specular (this is what makes it "metal")
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+
+    // Purple base color
+    vec3 baseColor = vec3(1.0, 0.439, 0.784);
+
+    // Metallic look = strong specular + tinted color
+    vec3 color = baseColor * diff + vec3(1.0) * spec * 1.5;
+
+    gl_FragColor = vec4(color, 1.0);
 }`
 
 
@@ -227,38 +251,119 @@ export class Blob {
         // Create blob mesh
         //maybe use dodecahedron instead
         const blobGeometry = new THREE.IcosahedronGeometry(3, 32);//radius, detail (default = 0) it adds more vertices, type of geometry that makes a bunch of triangular faces
-        const blobMaterial = new THREE.ShaderMaterial({
-            //color: 0xffdd33,
-            //emissive: 0xffee55,
-            //emissiveIntensity: 2.0,
-            //roughness: 0.1
-            // vertexShader: document.getElementById('vertexshader').textContent,//vertexShader, //projectionMatrix * modelViewMatrix * vec4(position, 1),
-            //fragmentShader: document.getElementById('fragmentshader').textContent,//fragmentShader, //{(vec3 colour = vec3(v0: 1, v1: 1, v2: 1)), gl_FragColor = vec4(v0: colour, v1: 1)
-            // },
+        // const blobMaterial = new THREE.ShaderMaterial({
+        //     color: 0xffdd33,
+        //     //emissive: 0xffee55,
+        //     //emissiveIntensity: 2.0,
+        //     //roughness: 0.1
+        //     // vertexShader: document.getElementById('vertexshader').textContent,//vertexShader, //projectionMatrix * modelViewMatrix * vec4(position, 1),
+        //     //fragmentShader: document.getElementById('fragmentshader').textContent,//fragmentShader, //{(vec3 colour = vec3(v0: 1, v1: 1, v2: 1)), gl_FragColor = vec4(v0: colour, v1: 1)
+        //     // },
 
-            vertexShader,//expects a str
-            fragmentShader,
-            uniforms: {//way can pass info along to shader
-                u_time: { value: 0.1 },//this value will be updated based on time in the update function
-            },
-            wireframe: true,
+        //     vertexShader,//expects a str
+        //     fragmentShader,
+        //     uniforms: {//way can pass info along to shader
+        //         u_time: { value: 0.1 },//this value will be updated based on time in the update function
+        //     },
+        //     wireframe: false,
+        //     metalness: 1.0,
 
-            //vertex shader manipulates vertices with perlin noise
-            //fragment shader gives different colors
+        //     //vertex shader manipulates vertices with perlin noise
+        //     //fragment shader gives different colors
 
 
 
+        // });
+
+        const material = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            metalness: 1.0,
+            roughness: 0.05, // IMPORTANT: lower = more mirror-like
         });
 
-        this.mesh = new THREE.Mesh(blobGeometry, blobMaterial);
+        this.material = material;
 
-        this.mesh.position.set(0, 0, 0);
-
+        this.mesh = new THREE.Mesh(blobGeometry, material);
         this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
 
         this.scene.add(this.mesh);
 
+        // -------------------------
+        // HDRI ENVIRONMENT (CRITICAL FOR METAL)
+        // -------------------------
+        // new RGBELoader().load(
+        //     'https://threejs.org/examples/textures/equirectangular/royal_esplanade_1k.hdr',
+        //     (texture) => {
 
+        //         texture.mapping = THREE.EquirectangularReflectionMapping;
+
+        //         this.scene.environment = texture;
+        //         this.scene.background = texture;
+        //     }
+        // );
+
+        // -------------------------
+        // LIGHTS (keep but don't overdo)
+        // -------------------------
+        const light1 = new THREE.DirectionalLight(0xffffff, 2);
+        light1.position.set(5, 5, 5);
+        scene.add(light1);
+
+        const light2 = new THREE.DirectionalLight(0xffffff, 1);
+        light2.position.set(-5, -3, -2);
+        scene.add(light2);
+
+        const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambient);
+
+        // -------------------------
+        // NOISE SHADER (optional deformation)
+        // -------------------------
+        const noiseGLSL = `
+        vec3 mod289(vec3 x){return x - floor(x*(1.0/289.0))*289.0;}
+        vec4 permute(vec4 x){return mod289(((x*34.0)+10.0)*x);}
+        vec3 fade(vec3 t){return t*t*t*(t*(t*6.0-15.0)+10.0);}
+
+        float cnoise(vec3 P){
+            vec3 Pi = floor(P);
+            vec3 Pf = fract(P);
+
+            vec4 ix = vec4(Pi.x, Pi.x+1.0, Pi.x, Pi.x+1.0);
+            vec4 iy = vec4(Pi.y, Pi.y, Pi.y+1.0, Pi.y+1.0);
+
+            vec4 ixy = permute(permute(ix) + iy);
+
+            vec4 gx = fract(ixy * 0.0243902439) * 2.0 - 1.0;
+
+            vec3 g = normalize(vec3(gx.x, gx.y, gx.z));
+
+            return dot(g, Pf);
+        }
+        `;
+
+        material.onBeforeCompile = (shader) => {
+
+            shader.uniforms.u_time = { value: 0 };
+            this.shader = shader;
+
+            shader.vertexShader =
+                `
+                uniform float u_time;
+                ${noiseGLSL}
+                ` + shader.vertexShader;
+
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <begin_vertex>',
+                `
+                #include <begin_vertex>
+
+                float noise = cnoise(position * 0.5 + vec3(u_time));
+
+                transformed += normal * noise * 0.4;
+                `
+            );
+        };
 
         // // Add glow effect
         // const glowGeometry = new THREE.SphereGeometry(3.3, 32, 32);
@@ -280,7 +385,11 @@ export class Blob {
         this.mesh.scale.set(pulse, pulse, pulse);
         //this.glow.scale.set(pulse * 1.1, pulse * 1.1, pulse * 1.1);
 
-        this.mesh.material.uniforms.u_time.value = time * 0.001;//sets the u_time value to get it's input from time in seconds
+        //this.mesh.material.uniforms.u_time.value = time * 0.001;//sets the u_time value to get it's input from time in seconds
+
+        if (this.shader) {
+            this.shader.uniforms.u_time.value = time * 0.001;
+        }
 
         //maybe do this with my blob in frag shader
         // Flicker light slightly
