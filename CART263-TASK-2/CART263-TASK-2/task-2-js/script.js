@@ -101,7 +101,7 @@ function setup() {
     an img element that holds `one.png`, and add the class newStyle to said paragraph element.
     /***CODE */
     let fifthParagraph = document.querySelectorAll("p")[4];
-    fifthParagraph.innerHTML += "<img src='one.png'>"
+    fifthParagraph.innerHTML += "<img src='task-2-images/one.png'>"
     fifthParagraph.classList.add("newStyle");
 
 
@@ -146,7 +146,7 @@ function setup() {
     let allPTagsThree = document.querySelectorAll("p")
     function customCreateElement(parent) {
         let newPara = document.createElement("p");
-        newPara.textContext = "using create Element";
+        newPara.textContent = "using create Element";
         newPara.style.backgroundColor = "green";
         newPara.style.color = "white";
         parent.appendChild(newPara);
@@ -196,8 +196,8 @@ function setup() {
         for (let col = 0; col < 10; col++) {
             let returnedDiv = customNewBoxCreate(gridParent)
             returnedDiv.style.position = "absolute";
-            returnedDiv.style.left = col * 20 + "px";
-            returnedDiv.style.top = row * 20 + "px";
+            returnedDiv.style.left = col * 40 + "px";
+            returnedDiv.style.top = row * 40 + "px";
         }
 
     }
@@ -229,16 +229,19 @@ function setup() {
 
         for (let col = 0; col < 10; col++) {
             let newReturnedDiv = customNewBoxCreate(newGridParent);
+            newReturnedDiv.style.position = "absolute";
+            newReturnedDiv.style.left = col * 40 + "px";
+            newReturnedDiv.style.top = row * 40 + "px";
 
             let remainder = col % 3
 
-            if (index % remainder === 0) {
+            if (remainder === 0) {
                 newReturnedDiv.style.backgroundColor = "red";
             }
-            else if (index % remainder === 1) {
+            else if (remainder === 1) {
                 newReturnedDiv.style.backgroundColor = "orange";
             }
-            else if (index % remainder === 2) {
+            else if (remainder === 2) {
                 newReturnedDiv.style.backgroundColor = "yellow";
             };
 
