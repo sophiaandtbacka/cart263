@@ -123,47 +123,79 @@ export class PlanetB {
         //TODO: Load Blender models to populate the planet with multiple props and critters by adding them to the planet group.
         //TODO: Make sure to rotate the models so they are oriented correctly relative to the surface of the planet.
 
-        // Trees
+        // note: planet radius: 1.5
+        // load in model 
         const loader = new GLTFLoader();
-        loader.load('/models/tree/scene.gltf', (gltf) => {
-            const tree1 = gltf.scene;
-            tree1.position.set(0, 1.4, 0);
-            tree1.scale.set(5, 5, 5);
-            planetB.add(tree1);
 
-            const positions = [
-                { pos: [0, 0, 1.4], rot: [Math.PI / 2, 0, 0] },
-                { pos: [1.4, 0, 0], rot: [0, 0, -Math.PI / 2] },
-                { pos: [0, -1.4, 0], rot: [Math.PI, 0, 0] },
-                { pos: [0, 0, -1.4], rot: [-Math.PI / 2, 0, 0] },
-                { pos: [-1.4, 0, 0], rot: [0, 0, Math.PI / 2] },
-            ];
-            positions.forEach(({ pos, rot }) => {
-                const t = tree1.clone();
-                t.position.set(...pos);
-                t.scale.set(5, 5, 5);
-                t.rotation.set(...rot);
-                planetB.add(t);
+        loader.load(
+            '/models/tree/scene.gltf', // path to model
+            (gltf) => {
+                const tree1 = gltf.scene;
+                tree1.position.set(0, 1.4, 0); // position
+                tree1.scale.set(5, 5, 5); // scale 
+                tree1.rotation.y = 0; // rotate 
+                //tree1.rotation.x = Math.PI / 2;
+                planetB.add(tree1);
+
+                var tree2 = tree1.clone();
+                tree2.position.set(0, 0, 1.4); // position
+                tree2.scale.set(5, 5, 5);
+                tree2.rotation.x = Math.PI / 2;
+                planetB.add(tree2)
+
+                var tree3 = tree1.clone();
+                tree3.position.set(1.4, 0, 0); // position
+                tree3.scale.set(5, 5, 5);
+                tree3.rotation.z = -Math.PI / 2;
+                planetB.add(tree3)
+
+                var tree4 = tree1.clone();
+                tree4.position.set(0, -1.4, 0); // position
+                tree4.scale.set(5, 5, 5);
+                tree4.rotation.x = Math.PI;
+                planetB.add(tree4)
+
+                var tree5 = tree1.clone();
+                tree5.position.set(0, 0, -1.4); // position
+                tree5.scale.set(5, 5, 5);
+                tree5.rotation.x = -Math.PI / 2;
+                planetB.add(tree5)
+
+                var tree6 = tree1.clone();
+                tree6.position.set(-1.4, 0, 0); // position
+                tree6.scale.set(5, 5, 5);
+                tree6.rotation.z = Math.PI / 2;
+                planetB.add(tree6);
+            },
+            undefined,
+            (error) => {
+                console.error('Error loading model:', error);
             });
-        }, undefined, (error) => console.error('Error loading tree:', error));
 
-        // Cat
         const catLoader = new GLTFLoader();
-        catLoader.load('/models/cat/scene.gltf', (gltf) => {
-            const cat1 = gltf.scene;
-            cat1.position.set(0, 1, 1);
-            cat1.scale.set(0.02, 0.02, 0.02);
-            cat1.rotation.x = Math.PI / 3;
-            planetB.add(cat1);
-        }, undefined, (error) => console.error('Error loading cat:', error));
 
-        //Click anywhere and get random glow color ---
-        this._onClick = () => {
-            this.planetBglow.material.color.setHex(Math.random() * 0xffffff);
-        };
-        window.addEventListener('click', this._onClick);
+        catLoader.load(
+            '/models/cat/scene.gltf', // path to model
+            (gltf) => {
+                const cat1 = gltf.scene;
+                cat1.position.set(0, 1, 1); // position
+                cat1.scale.set(0.02, 0.02, 0.02); // scale 
+                cat1.rotation.y = 0; // rotate 
+                cat1.rotation.x = Math.PI / 3;
+                planetB.add(cat1);
 
-        // --- Space bar: moon jump ---
+            },
+            undefined,
+            (error) => {
+                console.error('Error loading model:', error);
+            });
+
+
+        //STEP 4:
+        //TODO: Use raycasting in the click() method below to detect clicks on the models, and make an animation happen when a model is clicked.
+        //TODO: Use your imagination and creativity!
+
+        // using space key to make the moon jump
         this._onKeyDown = (e) => {
             if (e.code === 'Space' && !this.moonJumping) {
                 e.preventDefault();
@@ -185,21 +217,26 @@ export class PlanetB {
         // Rotate planet
         this.group.rotation.y += delta * 0.5;
 
-        // Moon orbits
+
+        //TODO: Do the moon orbits and the model animations here.
+
+        //Moons Orbiting PlanetB
         this.moons.forEach(moon => {
             moon.group.rotation.y += delta * moon.speed;
         });
 
-        // Moon jump — smooth sine arc over 0.6 seconds
+        // the duration and height of the jump of the moon 
         const JUMP_DURATION = 0.6;
         const JUMP_HEIGHT = 1.2;
         if (this.moonJumping) {
             this.moonJumpTime += delta;
-            const t = this.moonJumpTime / JUMP_DURATION;
+            const t = this.moonJumpTime / JUMP_DURATION; // 0 → 1
             if (t >= 1) {
+                // once the jumps over the moon reset to base position and reset jumping state
                 this.moonJumping = false;
                 this.moons.forEach(moon => { moon.mesh.position.y = moon.baseY; });
             } else {
+
                 const offset = Math.sin(Math.PI * t) * JUMP_HEIGHT;
                 this.moons.forEach(moon => {
                     moon.mesh.position.y = moon.baseY + offset;
@@ -209,11 +246,22 @@ export class PlanetB {
     }
 
     click(mouse, scene, camera) {
-        // Raycasting placeholder
+        //TODO: Do the raycasting here.
+
+        // Build raycaster from the mouse position and camera
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+
+        // Cast against everything inside this planet's group (planet, glow, moons, models)
+        const intersects = raycaster.intersectObjects(this.group.children, true);
+
+        if (intersects.length > 0) {
+            // random glow color when clicked
+            this.planetBglow.material.color.setHex(Math.random() * 0xffffff);
+        }
     }
 
     dispose() {
-        window.removeEventListener('click', this._onClick);
         window.removeEventListener('keydown', this._onKeyDown);
     }
 }
