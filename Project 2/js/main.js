@@ -9,7 +9,7 @@ import { Blob } from './blob.js';
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffe3e7); // pink background
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 30, 60);
 camera.lookAt(0, 0, 0);
 
@@ -71,5 +71,9 @@ renderer.domElement.addEventListener('click', (event) => {
     mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
     mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 
-    //planetF.click(mouse, scene, camera);
+    //going into blob
+    if (intersects.length > 0) {
+        this.state.mode = "entering";
+        this.state.targetBlob = this.blobMesh;
+    };
 });

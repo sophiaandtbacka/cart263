@@ -245,14 +245,23 @@ void main() {
 //local space (relative to the obj itself), world space (relative to the entire scene)
 
 export class Blob {
-    constructor(scene) {
+    constructor(scene, camera) {
+
         this.scene = scene;
+        this.camera = camera;
+
+        this.state = {
+            mode: "outside",
+            targetBlob: null,
+        }
+
+        //------BLOB EXTERIOR------//
 
         // Create blob mesh
         //maybe use dodecahedron instead
-        const blobGeometry = new THREE.IcosahedronGeometry(3, 32);//radius, detail (default = 0) it adds more vertices, type of geometry that makes a bunch of triangular faces
+        const blobGeometry = new THREE.IcosahedronGeometry(7, 32);//radius, detail (default = 0) it adds more vertices, type of geometry that makes a bunch of triangular faces
         const blobMaterial = new THREE.ShaderMaterial({
-            color: 0xffdd33,
+            //color: 0xffdd33,
             //emissive: 0xffee55,
             //emissiveIntensity: 2.0,
             //roughness: 0.1
@@ -266,7 +275,7 @@ export class Blob {
                 u_time: { value: 0.1 },//this value will be updated based on time in the update function
             },
             wireframe: false,
-            metalness: 1.0,
+            // metalness: 1.0,
 
             //vertex shader manipulates vertices with perlin noise
             //fragment shader gives different colors
@@ -283,11 +292,11 @@ export class Blob {
 
         // this.material = material;
 
-        this.mesh = new THREE.Mesh(blobGeometry, blobMaterial);
-        this.mesh.castShadow = true;
-        this.mesh.receiveShadow = true;
+        this.blobMesh = new THREE.Mesh(blobGeometry, blobMaterial);
+        this.blobMesh.castShadow = true;
+        this.blobMesh.receiveShadow = true;
 
-        this.scene.add(this.mesh);
+        this.scene.add(this.blobMesh);
 
         // -------------------------
         // HDRI ENVIRONMENT (CRITICAL FOR METAL)
@@ -377,15 +386,67 @@ export class Blob {
         // this.scene.add(this.glow);
 
 
+
+
+
+        //     //-----World Changing-----
+
+        //     this.raycaster = new THREE.Raycaster();
+
+        //     const state = {
+        //         mode: "outside",
+        //         targetBlob: null, //null means nothing is selected rn
+        //     }
+
+
+
+
+        //     function enterInsideWorld() {
+        //         state.mode = "inside";
+
+        //     }
+
+
+        //------INTERIOR BLOB------//
+        const blobInteriorGeometry = new THREE.SphereGeometry(5, 64, 64);
+        const blobInteriorMaterial = new THREE.MeshStandardMaterial({
+            color: 0x000000,
+            side: THREE.Backside,
+        })
+        this.blobInteriorMesh = new THREE.Mesh(blobInteriorGeometry, blobInteriorMaterial);
+
+        interiorBlobMesh.scale(-1, 1, 1);
+
+
+        //------RAYCASTING------//
+        this.blobRaycaster = new THREE.Raycaster();
+
+        this.currentIntersectedBlob = null;
+
+
     }
+
+
+    enterInsideWorld() {
+        state.mode = "inside";
+
+        outsideGroup.visible = false;
+        insideGroup.visible = true;
+
+        camera.position.set(0, 0, 0);
+
+        scene.fog.density = 0;
+    }
+
+
 
     update(time) {
         // Pulse slightly
         const pulse = 1 + Math.sin(time * 0.002) * 0.02;
-        this.mesh.scale.set(pulse, pulse, pulse);
+        this.blobMesh.scale.set(pulse, pulse, pulse);
         //this.glow.scale.set(pulse * 1.1, pulse * 1.1, pulse * 1.1);
 
-        this.mesh.material.uniforms.u_time.value = time * 0.001;//sets the u_time value to get it's input from time in seconds
+        this.blobMesh.material.uniforms.u_time.value = time * 0.001;//sets the u_time value to get it's input from time in seconds
 
         if (this.shader) {
             this.shader.uniforms.u_time.value = time * 0.001;
@@ -394,5 +455,82 @@ export class Blob {
         //maybe do this with my blob in frag shader
         // Flicker light slightly
         //this.light.intensity = 2.5 + Math.sin(time * 0.01) * 0.2;
+
+
+
+        //raycasting
+
+
+
+
+        this.blobRaycaster.setFromCamera(mouse, camera);
+
+        const blobToTest = [this.blobMesh];
+
+        const intersects = this.blobRaycaster.intersectObjects(blobToTest);
+
+        // //for if you just want one active at a time
+        // if (intersects.length > 0) {
+        //there was none so we enter
+        // if (currentIntersectedBlob === null) {
+        // state.mode = "entering"
+        //currentIntersectedBlob = intersects[0]; //take first
+        //console.log("mouse enter");
+        //currentIntersectedBlob.object.material.color.set("#00c3ff");
+        // }
+        //     else {
+
+        //         //the currently selected one is NO LONGER IN THE LIST
+        //         if (intersects.find(findIfCurrentBlobIsActive) === undefined) {
+        //             currentIntersectedBlob.object.material.color.set("#ff0000");
+        //             currentIntersectedBlob = intersects[0]; //take first
+        //             //currentIntersectedBlob.object.material.color.set("#00c3ff");
+
+        //         }
+        //     }
+        // }
+
+
+
+        function findIfCurrentObjIsActive(intersect) {
+            return intersect.object === currentIntersectedObj.object;
+        }
+
+        function blobEnter() {
+            if (!state.targetBlob) return;
+
+            const targetPos = state.targetBlob.position;
+
+            camera.position.lerp(targetPos, 0.03);
+        }
+
+        if (state.mode === "entering") {
+            scene.fog.density += 0.01;
+        }
     }
 }
+
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+camera.position.z = 3;
+
+const mouse = new THREE.Vector2();
+window.addEventListener("mousemove", function (event) {
+    mouse.x = (event.clientX / sizes.width) * 2 - 1; //map to between -1,1
+    mouse.y = -(event.clientY / sizes.height) * 2 + 1; //map to between -1,1
+    //console.log(mouse);
+});
+
+//if only one is active and click then change color
+window.addEventListener("click", function (event) {
+    if (intersects.length > 0) {
+
+        if (currentIntersectedBlob !== null) {
+            console.log("click")
+            state.mode = "entering";
+
+        }
+    }
+})
+
+blobRaycaster.setFromCamera(mouse, camera);
+
