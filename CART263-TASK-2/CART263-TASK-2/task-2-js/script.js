@@ -113,8 +113,17 @@ function setup() {
     (i.e. colors[0] should be allocated to the first innerContainers element, colors[1] to the second, etc ...) 
     a background using that color.
     /***CODE */
-    let innerContainer = document.getElementsByClassName("inner-container");
-    innerContainer
+
+    let colors = ['red', 'blue', 'green', 'orange'];
+
+    let innerContainers = document.getElementsByClassName("inner-container");
+
+    let length = innerContainers.length
+
+    for (let i = 0; i < length; i++) {
+        innerContainers[i].style.backgroundColor = colors[i];
+    }
+
 
     /*************************************** */
     /*** END PART TWO MODIFY */
