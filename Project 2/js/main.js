@@ -3,13 +3,14 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 //import fragmentShader from "./Sphere.fragment.glsl?raw";
 //import vertexShader from "./Sphere.vertex.glsl?raw";
 
-import { Blob } from './blob.js';
+import { Blob } from './blob2.js';
+import { Line } from './lightLine.js';
 
 // --- Core Setup ---
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffe3e7); // pink background
 
-camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+let camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 30, 60);
 camera.lookAt(0, 0, 0);
 
@@ -35,6 +36,7 @@ scene.add(ambientLight);
 
 // --- Create Sun (center of solar system) ---
 const blob = new Blob(scene);
+const line = new Line(scene);
 
 
 
@@ -47,9 +49,9 @@ function animate(timer) {
     elapsedTime = timer;
 
     // Update sun
-    blob.update(timer);
+    // blob.update(timer);
 
-
+    line.update();   //
 
     controls.update();
     renderer.render(scene, camera);
@@ -72,8 +74,8 @@ renderer.domElement.addEventListener('click', (event) => {
     mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
 
     //going into blob
-    if (intersects.length > 0) {
-        this.state.mode = "entering";
-        this.state.targetBlob = this.blobMesh;
-    };
+    // if (intersects.length > 0) {
+    //     this.state.mode = "entering";
+    //     this.state.targetBlob = this.blobMesh;
+    // };
 });
