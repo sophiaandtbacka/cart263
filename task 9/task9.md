@@ -1,12 +1,13 @@
 # Task 9 - Project 2 Response
 
-## P — *Aquarium*
+## Sama — *Locust*
+I believe the strongest aspect of this project is the integration of tactile input, audio, and visual output creates a cohesive multi-sensory experience. I find the movement of the locust very beautiful and it reminds me of an evolving particle system mapped on a sine wave. However, each key produces the same wave displacement, making the interaction feel uniform. Additionally, when pressing multiple keys there’s an additive displacement which often pushes the effect off screen, disrupting visual continuity. I also believe that adding variation from different key inputs could strengthen the connection between sound and image. For example, varying colors or wave amplitudes per key would make the visuals feel more responsive to the audio. However, on the coding aspect the structure of accessing the image API to group pixels into segments is very interesting. It makes me think how else if could be applied such such as mapping keys to specific rgb ranges and having the music distort the image in this way.
 
+## pansyqwq - *UNKNOWN MOTHER-GOOSE*
+This project similarly hinges on connecting audio and visuals. Two pages that stood out was the first heart visual and the last offset visual. The first visual is really interesting as the curvature of the heart’s interior allows the displacement to read as a breathing motion, as if the form is opening and closing. However, the shape could be refined, as some fragments overlap in ways that break the illusion of a unified, living form. On the other hand you could lean into this and make the segments really overlap one another in a sort of stabbing motion reinforcing the broken heart narrative. Moving to the off-limits visuals, I find that they are effective in demonstrating how very simple forms in THREE.js, combined with motion and orbit controls, can produce an incredibly immersive environment. A redundancy I found in both of these pages though was using separation of the audio and visuals play and pause buttons, I believe that the strength of the work lies in their connectedness and therefore this breaks up that interaction. 
 
-## N - *Super Real Game*
-
-
-## H - *Optic Interactions*
+## Leah - *an einem seltsamen Ort*
+This project is highly impressive, demonstrating a cohesive integration of concept, aesthetics, and technical execution. The visual language evokes a Bauhaus aesthetic, which aligns seamlessly with the Berlin techno context, creating a strong and intentional identity. Technically, the hand model reminds me of TouchDesigner. The hand model also uses of an existing face detection script which I think is a good reminder that one can build on other’s work and that it isn’t necessary to write everything from scratch. You can use other’s other’s code as a tool and reuse reimagine it in a different context and add value. Out of the three different models I especially liked the visuals created by the speech recognition model, The color pallette chosen reminds me of an oil spill or of the color of cracks in a windsheild. I also love the thinness of the lines as it feels like thes audio is layering and weaving into each other to create a textile of sound. Moving onto the website as a whole I think the large icons show an accessibility consideration and reminds me the importance of not forgetting accessibility features such as adding text to speech in the metadata. 
 
 
 
