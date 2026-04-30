@@ -12,7 +12,7 @@ export class Line {
 
         ])
         //divide curve into points
-        const pointNum = 50
+        const pointNum = 300
         this.samplePoints = line.getSpacedPoints(pointNum);
 
         this.geometry = new THREE.BufferGeometry().setFromPoints(this.samplePoints);
@@ -23,7 +23,7 @@ export class Line {
         this.geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
         const material = new THREE.PointsMaterial({
-            size: .8,
+            size: 2,
             vertexColors: true,
             transparent: true,
             blending: THREE.AdditiveBlending,
