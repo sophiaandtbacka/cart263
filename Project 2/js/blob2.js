@@ -59,7 +59,7 @@ export class Blob {
             emissiveIntensity: 0.4,
         });
 
-        let specialForm = new THREE.Mesh(geometry_iso, material_iso3);
+        let specialForm = new THREE.Mesh(geometry_iso, material_iso);
         specialForm.position.y = 0.5;
         scene.add(specialForm);
     }
