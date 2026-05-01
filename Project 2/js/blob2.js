@@ -1,3 +1,5 @@
+//haven't been able to make same perlin movement
+
 import * as THREE from 'three';
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
@@ -21,7 +23,7 @@ export class Blob {
         const positionAttribute = geometry_iso.getAttribute('position');
         const vertex = new THREE.Vector3();
 
-        const perlin = new ImprovedNoise();
+        const perlin = 'new ImprovedNoise()';
 
 
         //apply perlin noise to the verticies

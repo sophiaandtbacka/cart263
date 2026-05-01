@@ -1,3 +1,7 @@
+/*the blobs light and color is controlled in the shader because lights won't be able to effect the geometry with this set up*/
+
+
+
 //import * as THREE from 'three';
 //import { RGBELoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/RGBELoader.js';
 
@@ -177,7 +181,7 @@ float pnoise(vec3 P, vec3 rep)
 
 varying vec3 v_normal;//varying makes it so vector can be passed onto shader
 
-uniform float u_time;//
+uniform float u_time;//will update vertex position
 
 void main() {
 
@@ -214,84 +218,52 @@ varying vec3 v_normal;
 void main() {
     vec3 lightDir = normalize(vec3(2.0, 2.0, 0.0));
 
-    float lightAmount = max(dot(v_normal, lightDir), 0.0);
+    float lightAmount = max(dot(v_normal, lightDir)* 0.5 + 0.5, 0.1);//remap the light range to not go to pure black, 0.5 how blended, 0.6 controls what the darkest is
 
-    gl_FragColor = vec4(vec3(lightAmount)*1.1, 1); //1.1 is intensity of light
-    
-    // vec3 normal = normalize(v_normal);
-    
-    // vec3 lightDir = normalize(vec3(2.0, 2.0, 2.0));
-    // vec3 viewDir = normalize(vec3(0.0, 0.0, 1.0)); // camera direction
+     vec3 baseColor = vec3(0.557, 0.620, 0.749); // blue color, normalized rgb
 
-    // // Diffuse
-    // float diff = max(dot(normal, lightDir), 0.0);
+    vec3 color = baseColor * lightAmount * 1.9;
 
-    // // Specular (this is what makes it "metal")
-    // vec3 reflectDir = reflect(-lightDir, normal);
-    // float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-
-    // // Purple base color
-    // vec3 baseColor = vec3(1.0, 0.439, 0.784);
-
-    // // Metallic look = strong specular + tinted color
-    // vec3 color = baseColor * diff + vec3(1.0) * spec * 1.5;
-
-    // gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, 1);
+   
 }`
 
+const fragmentShaderGlow = `
+varying vec3 v_normal;
+
+void main() {
+   vec3 viewDir = normalize(vec3(0.0, 0.0, 1.0));
+    float fresnel = pow(1.0 - abs(dot(v_normal, viewDir)), 2.0);
+
+    vec3 glowColor = vec3(0.2, 0.6, 1.0); // blue glow
+
+    gl_FragColor = vec4(glowColor * fresnel, fresnel);
+}`
 
 //---NOTES---
 //rendering pipeline mesh => vertex shader(rasterization) => fragment shader
 //local space (relative to the obj itself), world space (relative to the entire scene)
 
 export class Blob {
-    constructor(scene, camera) {
+    constructor(scene, camera, /*samplePoints = []*/) {
 
         this.scene = scene;
         this.camera = camera;
 
-        this.state = {
-            mode: "outside",
-            targetBlob: null,
-        }
 
-        //------BLOB EXTERIOR------//
-
-        // Create blob mesh
-        //maybe use dodecahedron instead
+        //Blob Exterior, maybe in the future use dodecahedron instead
         const blobGeometry = new THREE.IcosahedronGeometry(7, 32);//radius, detail (default = 0) it adds more vertices, type of geometry that makes a bunch of triangular faces
         const blobMaterial = new THREE.ShaderMaterial({
-            //color: 0xffdd33,
-            //emissive: 0xffee55,
-            //emissiveIntensity: 2.0,
-            //roughness: 0.1
-            // vertexShader: document.getElementById('vertexshader').textContent,//vertexShader, //projectionMatrix * modelViewMatrix * vec4(position, 1),
-            //fragmentShader: document.getElementById('fragmentshader').textContent,//fragmentShader, //{(vec3 colour = vec3(v0: 1, v1: 1, v2: 1)), gl_FragColor = vec4(v0: colour, v1: 1)
-            // },
-
-            vertexShader,//expects a str
-            fragmentShader,
+            vertexShader,//manipulates vertices with perlin noise, expects a str
+            fragmentShader: fragmentShader,//gives different colors
             uniforms: {//way can pass info along to shader
                 u_time: { value: 0.1 },//this value will be updated based on time in the update function
             },
             wireframe: false,
-            // metalness: 1.0,
-
-            //vertex shader manipulates vertices with perlin noise
-            //fragment shader gives different colors
-
-
-
+            //opacity: .8,
         });
 
 
-        // const material = new THREE.MeshStandardMaterial({
-        //     color: 0xffffff,
-        //     metalness: 1.0,
-        //     roughness: 0.05, // IMPORTANT: lower = more mirror-like
-        // });
-
-        // this.material = material;
 
         this.blobMesh = new THREE.Mesh(blobGeometry, blobMaterial);
         this.blobMesh.castShadow = true;
@@ -299,151 +271,52 @@ export class Blob {
 
         this.scene.add(this.blobMesh);
 
+        //not working rn
+        // this.samplePoints = samplePoints;
+        //this.blobs = [];
+        // const blobNum2 = 3;
+
+        // for (let i = 0; i < blobNum2; i++) {
+
+        //     const mesh = new THREE.Mesh(blobGeometry, blobMaterial);
+
+        //     mesh.position.copy(samplePoints[i]);
+
+        //     scene.add(mesh);
+        //     this.blobs.push(mesh);
+        // }
 
         //create outside blob glow
-        //need to fix shader so that I can add transparency 
-        //this.blobGlow = new THREE.Mesh(blobGeometry.clone, blobGeometry.clone);
-        //this.blobGlow.scale.set(1.2, 1.2, 1.2);
+        //need to fix shader so that I can add transparency
+        const blobGlowMaterial = new THREE.ShaderMaterial({
+            vertexShader,//manipulates vertices with perlin noise, expects a str
+            fragmentShader: fragmentShaderGlow,//gives different colors
+            uniforms: {//way can pass info along to shader
+                u_time: { value: 0.1 },//this value will be updated based on time in the update function
+            },
+            wireframe: false,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            opacity: .8,
+        });
+        this.blobGlow = new THREE.Mesh(blobGeometry.clone(), blobGlowMaterial);
+        this.blobGlow.scale.set(1.2, 1.2, 1.2);
+        this.scene.add(this.blobGlow);
 
 
-        // -------------------------
-        // HDRI ENVIRONMENT (CRITICAL FOR METAL)
-        // -------------------------
-        // new RGBELoader().load(
-        //     'https://threejs.org/examples/textures/equirectangular/royal_esplanade_1k.hdr',
-        //     (texture) => {
-
-        //         texture.mapping = THREE.EquirectangularReflectionMapping;
-
-        //         this.scene.environment = texture;
-        //         this.scene.background = texture;
-        //     }
-        // );
-
-        // -------------------------
-        // LIGHTS (keep but don't overdo)
-        // -------------------------
-        //     const light1 = new THREE.DirectionalLight(0xffffff, 2);
-        //     light1.position.set(5, 5, 5);
-        //     scene.add(light1);
-
-        //     const light2 = new THREE.DirectionalLight(0xffffff, 1);
-        //     light2.position.set(-5, -3, -2);
-        //     scene.add(light2);
-
-        //     const ambient = new THREE.AmbientLight(0xffffff, 0.2);
-        //     scene.add(ambient);
-
-        //     // -------------------------
-        //     // NOISE SHADER (optional deformation)
-        //     // -------------------------
-        //     const noiseGLSL = `
-        // vec3 mod289(vec3 x){return x - floor(x*(1.0/289.0))*289.0;}
-        // vec4 permute(vec4 x){return mod289(((x*34.0)+10.0)*x);}
-        // vec3 fade(vec3 t){return t*t*t*(t*(t*6.0-15.0)+10.0);}
-
-        // float cnoise(vec3 P){
-        //     vec3 Pi = floor(P);
-        //     vec3 Pf = fract(P);
-
-        //     vec4 ix = vec4(Pi.x, Pi.x+1.0, Pi.x, Pi.x+1.0);
-        //     vec4 iy = vec4(Pi.y, Pi.y, Pi.y+1.0, Pi.y+1.0);
-
-        //     vec4 ixy = permute(permute(ix) + iy);
-
-        //     vec4 gx = fract(ixy * 0.0243902439) * 2.0 - 1.0;
-
-        //     vec3 g = normalize(vec3(gx.x, gx.y, gx.z));
-
-        //     return dot(g, Pf);
-        // }
-        // `;
-
-        //     material.onBeforeCompile = (shader) => {
-
-        //         shader.uniforms.u_time = { value: 0 };
-        //         this.shader = shader;
-
-        //         shader.vertexShader =
-        //             `
-        //         uniform float u_time;
-        //         ${noiseGLSL}
-        //         ` + shader.vertexShader;
-
-        //         shader.vertexShader = shader.vertexShader.replace(
-        //             '#include <begin_vertex>',
-        //             `
-        //         #include <begin_vertex>
-
-        //         float noise = cnoise(position * 0.5 + vec3(u_time));
-
-        //         transformed += normal * noise * 0.4;
-        //         `
-        //         );
-        //     };
-
-        // // Add glow effect
-        // const glowGeometry = new THREE.SphereGeometry(3.3, 32, 32);
-        // const glowMaterial = new THREE.MeshBasicMaterial({
-        //     color: 0xffaa33,
-        //     transparent: true,
-        //     opacity: 0.3
-        // });
-        // this.glow = new THREE.Mesh(glowGeometry, glowMaterial);
-        // this.glow.castShadow = false;
-        // this.scene.add(this.glow);
+        //raycasting 
+        this.blobRaycaster = new THREE.Raycaster();
 
 
+        //doesn't work because of my shader set up, keeping it because maybe I will make it work in the future
+        // const spotLight = new THREE.SpotLight(0x78ff00, 1, 0, Math.PI / 3, 0, 2)
+        // spotLight.position.set(0, 2, 3);
+        // spotLight.target = (this.blobMesh);
+        // scene.add(spotLight)
+        // scene.add(spotLight.target)//default 0,0,0
 
 
-
-        //     //-----World Changing-----
-
-        //     this.raycaster = new THREE.Raycaster();
-
-        //     const state = {
-        //         mode: "outside",
-        //         targetBlob: null, //null means nothing is selected rn
-        //     }
-
-
-
-
-        //     function enterInsideWorld() {
-        //         state.mode = "inside";
-
-        //     }
-
-
-        // //------INTERIOR BLOB------//
-        // const blobInteriorGeometry = new THREE.SphereGeometry(5, 64, 64);
-        // const blobInteriorMaterial = new THREE.MeshStandardMaterial({
-        //     color: 0x000000,
-        //     side: THREE.Backside,
-        // })
-        // this.blobInteriorMesh = new THREE.Mesh(blobInteriorGeometry, blobInteriorMaterial);
-
-        //interiorBlobMesh.scale(-1, 1, 1);
-
-
-        // //------RAYCASTING------//
-        // this.blobRaycaster = new THREE.Raycaster();
-
-        // this.currentIntersectedBlob = null;
-
-
-    }
-
-
-    enterInsideWorld() {
-        state.mode = "inside";
-
-        outsideGroup.visible = false;
-        insideGroup.visible = true;
-
-        camera.position.set(0, 0, 0);
-
-        scene.fog.density = 0;
     }
 
 
@@ -455,96 +328,13 @@ export class Blob {
         //this.glow.scale.set(pulse * 1.1, pulse * 1.1, pulse * 1.1);
 
         this.blobMesh.material.uniforms.u_time.value = time * 0.001;//sets the u_time value to get it's input from time in seconds
+        this.blobGlow.material.uniforms.u_time.value = time * 0.001;//sets the u_time value to get it's input from time in seconds
 
         if (this.shader) {
             this.shader.uniforms.u_time.value = time * 0.001;
         }
 
-        //maybe do this with my blob in frag shader
-        // Flicker light slightly
-        //this.light.intensity = 2.5 + Math.sin(time * 0.01) * 0.2;
 
-
-
-        //raycasting
-
-
-
-
-        //this.blobRaycaster.setFromCamera(mouse, camera);
-
-        // const blobToTest = [this.blobMesh];
-
-        // const intersects = this.blobRaycaster.intersectObjects(blobToTest);
-
-        // //for if you just want one active at a time
-        // if (intersects.length > 0) {
-        //there was none so we enter
-        // if (currentIntersectedBlob === null) {
-        // state.mode = "entering"
-        //currentIntersectedBlob = intersects[0]; //take first
-        //console.log("mouse enter");
-        //currentIntersectedBlob.object.material.color.set("#00c3ff");
-        // }
-        //     else {
-
-        //         //the currently selected one is NO LONGER IN THE LIST
-        //         if (intersects.find(findIfCurrentBlobIsActive) === undefined) {
-        //             currentIntersectedBlob.object.material.color.set("#ff0000");
-        //             currentIntersectedBlob = intersects[0]; //take first
-        //             //currentIntersectedBlob.object.material.color.set("#00c3ff");
-
-        //         }
-        //     }
-        // }
-
-
-
-        // function findIfCurrentObjIsActive(intersect) {
-        //     return intersect.object === currentIntersectedObj.object;
-        // }
-
-        // function blobEnter() {
-        //     if (!state.targetBlob) return;
-
-        //     const targetPos = state.targetBlob.position;
-
-        //     camera.position.lerp(targetPos, 0.03);
-        // }
-
-        // if (state.mode === "entering") {
-        //     scene.fog.density += 0.01;
-        // }
     }
 
-
-    //entering movement
-    //     if(this.state.mode === "entering") {
-
-    //     this.camera.position.lerp(this.blobMesh.position, 0.03);
-
-    //     this.scene.fog.density += 0.003;
-
-    //     const dist = this.camera.position.distanceTo(this.blobMesh.position);
-
-    //     if (dist < 0.5) {
-    //         this.enterInsideWorld();
-    //     }
-    // }
-
-
 }
-
-// const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
-// camera.position.z = 3;
-
-// const mouse = new THREE.Vector2();
-// window.addEventListener("mousemove", function (event) {
-//     mouse.x = (event.clientX / sizes.width) * 2 - 1; //map to between -1,1
-//     mouse.y = -(event.clientY / sizes.height) * 2 + 1; //map to between -1,1
-//     //console.log(mouse);
-// });
-
-
-// blobRaycaster.setFromCamera(mouse, camera);
-
